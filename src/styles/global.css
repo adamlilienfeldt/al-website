@@ -44,7 +44,7 @@ nav {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  padding: 36px var(--page-pad) 14px;
+  padding: 20px var(--page-pad) 14px;
 }
 
 .nav-heading {
@@ -127,7 +127,7 @@ main {
 @media (max-width: 600px) {
   :root { --page-pad: 16px; }
   .grid { grid-template-columns: repeat(2, 1fr); }
-  nav { padding: 52px 16px 14px; }
+  nav { padding: 24px 16px 14px; }
   .hero { padding: 4px 16px 24px; }
   .film-grid { grid-template-columns: 1fr; }
 }
@@ -151,6 +151,13 @@ main {
   height: 100%;
   object-fit: cover;
   display: block;
+  transition: transform 0.4s ease;
+}
+
+@media (hover: hover) {
+  .card:hover img {
+    transform: scale(1.05);
+  }
 }
 
 .card-placeholder {

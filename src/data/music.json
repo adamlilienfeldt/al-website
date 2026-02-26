@@ -1,6 +1,6 @@
 [
   {
-    "order": 1,
+    "order": 6,
     "artist": "Kindsight",
     "title": "Swedish Punk",
     "type": "album",
@@ -11,7 +11,7 @@
     "label": "Rama Lama Records"
   },
   {
-    "order": 2,
+    "order": 15,
     "artist": "Kindsight",
     "title": "Love You Baby All the Time",
     "type": "single",
@@ -22,7 +22,7 @@
     "label": "Rama Lama Records"
   },
   {
-    "order": 3,
+    "order": 9,
     "artist": "Slørede Linier",
     "title": "Hele Verden, Altid",
     "type": "album",
@@ -33,7 +33,7 @@
     "label": "Kös"
   },
   {
-    "order": 4,
+    "order": 10,
     "artist": "Slørede Linier",
     "title": "Uendeligt",
     "type": "single",
@@ -44,7 +44,7 @@
     "label": "Kös"
   },
   {
-    "order": 5,
+    "order": 13,
     "artist": "Slørede Linier",
     "title": "Med Tid Vokser Det Fra Os / Venner Lever Tusind År",
     "type": "single",
@@ -55,7 +55,7 @@
     "label": "Kös"
   },
   {
-    "order": 6,
+    "order": 4,
     "artist": "Elvira Alfaro",
     "title": "Human",
     "type": "single",
@@ -66,7 +66,7 @@
     "label": "Capella Records"
   },
   {
-    "order": 7,
+    "order": 11,
     "artist": "Elvira Alfaro",
     "title": "in love with a feeling",
     "type": "EQ",
@@ -77,7 +77,7 @@
     "label": ""
   },
   {
-    "order": 8,
+    "order": 18,
     "artist": "Elvira Alfaro",
     "title": "space",
     "type": "single",
@@ -88,7 +88,7 @@
     "label": "Capella Records"
   },
   {
-    "order": 9,
+    "order": 16,
     "artist": "Elvira Alfaro",
     "title": "Indigo",
     "type": "single",
@@ -99,7 +99,7 @@
     "label": "Capella Records"
   },
   {
-    "order": 10,
+    "order": 14,
     "artist": "Vera Decay",
     "title": "Cinders",
     "type": "single",
@@ -110,7 +110,7 @@
     "label": "Nordic Music Society"
   },
   {
-    "order": 11,
+    "order": 17,
     "artist": "Fraads",
     "title": "FRaaaDS",
     "type": "album",
@@ -121,7 +121,7 @@
     "label": "Sony Music"
   },
   {
-    "order": 12,
+    "order": 5,
     "artist": "Fraads",
     "title": "Hard drive schlappers (tracks 4+5)",
     "type": "album",
@@ -132,18 +132,18 @@
     "label": "Sony Music"
   },
   {
-    "order": 13,
+    "order": 1,
     "artist": "Sara Lina",
     "title": "Us Girls",
     "type": "single",
-    "year": "",
+    "year": "2025",
     "link": "https://song.link/s/6imIpDAHSQdWIA6W9YIv6W",
     "cover": "/images/sara-lina-us-girls.jpg",
     "credits": "mixer",
     "label": "Nordic Music Society"
   },
   {
-    "order": 14,
+    "order": 3,
     "artist": "Sara Lina",
     "title": "Brava",
     "type": "single",
@@ -154,7 +154,7 @@
     "label": "Nordic Music Society"
   },
   {
-    "order": 15,
+    "order": 12,
     "artist": "Erik Apollo",
     "title": "Digter",
     "type": "single",
@@ -165,7 +165,7 @@
     "label": "Nordic Music Society"
   },
   {
-    "order": 16,
+    "order": 19,
     "artist": "J. Fen Hapens",
     "title": "22 Skidoo / Sundays",
     "type": "single",
@@ -176,7 +176,7 @@
     "label": ""
   },
   {
-    "order": 17,
+    "order": 20,
     "artist": "J. Fen Hapens",
     "title": "Getting Later / Troubled",
     "type": "single",
@@ -187,7 +187,7 @@
     "label": ""
   },
   {
-    "order": 18,
+    "order": 2,
     "artist": "Niah Steiner",
     "title": "Hide n Seek",
     "type": "single",
@@ -198,7 +198,7 @@
     "label": ""
   },
   {
-    "order": 19,
+    "order": 7,
     "artist": "Elba",
     "title": "Hvad laver du nu?",
     "type": "single",
@@ -209,7 +209,7 @@
     "label": "Nordic Music Society"
   },
   {
-    "order": 20,
+    "order": 8,
     "artist": "ALAWARI",
     "title": "Leviathan",
     "type": "album",

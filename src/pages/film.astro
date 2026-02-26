@@ -3,8 +3,9 @@ import Layout from '../layouts/Layout.astro';
 import FilmCard from '../components/FilmCard.astro';
 import films from '../data/film.json';
 
-const videos = films.filter((f) => f.vimeo_id);
-const posters = films.filter((f) => !f.vimeo_id);
+const sorted = [...films].sort((a, b) => ((a as any).order ?? Infinity) - ((b as any).order ?? Infinity));
+const videos = sorted.filter((f) => f.vimeo_id);
+const posters = sorted.filter((f) => !f.vimeo_id);
 ---
 
 <Layout title="film — adam lilienfeldt" activePage="film">

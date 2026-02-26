@@ -1,5 +1,6 @@
 [
   {
+    "order": 1,
     "title": "A Word For Human",
     "role": "co-composer (with christian balvig)",
     "year": "",
@@ -8,6 +9,7 @@
     "vimeo_id": "302691761"
   },
   {
+    "order": 2,
     "title": "Kødsår",
     "role": "composer",
     "year": "",
@@ -16,6 +18,7 @@
     "vimeo_id": ""
   },
   {
+    "order": 3,
     "title": "Trommeslager",
     "role": "co-composer (with christian balvig)",
     "year": "",

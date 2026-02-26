@@ -305,3 +305,63 @@ footer {
 .social-icon:hover {
   color: var(--text);
 }
+
+/* ─── Odesli embed modal ─────────────────────────────── */
+
+.odesli-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.5);
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.odesli-modal.open {
+  display: flex;
+}
+
+.odesli-modal-content {
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px;
+  width: 25%;
+  min-width: 280px;
+  position: relative;
+}
+
+@media (max-width: 600px) {
+  .odesli-modal-content {
+    width: 100%;
+  }
+}
+
+.odesli-modal-close {
+  position: absolute;
+  top: -32px;
+  right: 0;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 24px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 4px;
+}
+
+.odesli-loader {
+  text-align: center;
+  font-size: 12px;
+  color: #999;
+  padding: 14px 0;
+  font-weight: 100;
+}
+
+.odesli-modal iframe {
+  width: 100%;
+  height: 150px;
+  border: 0;
+  border-radius: 4px;
+}

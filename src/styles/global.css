@@ -12,6 +12,7 @@
   --overlay-bg: rgba(0, 0, 0, 0.72);
   --font: "Helvetica Neue", Helvetica, Arial, sans-serif;
   --page-pad: 40px;
+  --card-hover-scale: 0.99; /* set to 1 to disable */
 }
 
 html {
@@ -116,7 +117,7 @@ main {
 .grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 4px;
+  gap: 12px;
   padding: 0 var(--page-pad);
 }
 
@@ -127,7 +128,7 @@ main {
 @media (max-width: 600px) {
   :root { --page-pad: 16px; }
   .grid { grid-template-columns: repeat(2, 1fr); }
-  nav { padding: 52px 16px 14px; }
+  nav { padding: 28px 16px 14px; }
   .hero { padding: 4px 16px 24px; }
   .film-grid { grid-template-columns: 1fr; }
 }
@@ -140,6 +141,13 @@ main {
   overflow: hidden;
   cursor: default;
   background: var(--placeholder);
+  transition: transform 0.2s ease;
+}
+
+@media (hover: hover) {
+  .card:hover {
+    transform: scale(var(--card-hover-scale));
+  }
 }
 
 .card.has-link {

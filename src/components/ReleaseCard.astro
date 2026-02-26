@@ -1,0 +1,87 @@
+---
+import { SHOW_TYPE, SHOW_YEAR, SHOW_CREDITS, SHOW_LABEL } from '../config';
+
+interface Props {
+  artist: string;
+  title: string;
+  type?: string;
+  year?: string;
+  link?: string;
+  cover?: string;
+  credits?: string;
+  label?: string;
+}
+
+const { artist, title, type, year, link, cover, credits, label } = Astro.props;
+const hasLink = Boolean(link);
+---
+
+<div
+  class:list={['card', { 'has-link': hasLink }]}
+  data-link={link || ''}
+  role={hasLink ? 'link' : undefined}
+  tabindex={hasLink ? 0 : undefined}
+  aria-label={hasLink ? `${title} by ${artist} — open on streaming` : undefined}
+>
+  {cover
+    ? <img src={cover} alt={`${title} by ${artist}`} loading="lazy" />
+    : <div class="card-placeholder" aria-hidden="true" />
+  }
+
+  <div class="card-overlay">
+    <p class="card-heading">{artist} - {title}</p>
+    {SHOW_CREDITS && credits && <p class="card-credits">{credits}</p>}
+    {SHOW_LABEL && label && <p class="card-label">({label})</p>}
+    {(SHOW_YEAR && year || SHOW_TYPE && type) && (
+      <div class="card-meta">
+        {SHOW_YEAR && year && <span class="card-year">{year}</span>}
+        {SHOW_TYPE && type && <span class="card-type">{type}</span>}
+      </div>
+    )}
+  </div>
+</div>
+
+<script>
+  function initCards() {
+    const cards = document.querySelectorAll<HTMLElement>('.card');
+
+    document.addEventListener('click', (e) => {
+      const target = e.target as Element;
+      const clickedCard = target.closest<HTMLElement>('.card');
+
+      cards.forEach((card) => {
+        if (card === clickedCard) return;
+        card.classList.remove('active');
+      });
+
+      if (!clickedCard) return;
+
+      const isTouchDevice = window.matchMedia('(hover: none)').matches;
+
+      if (isTouchDevice) {
+        const link = clickedCard.dataset.link;
+        if (clickedCard.classList.contains('active')) {
+          if (link) window.open(link, '_blank', 'noopener');
+          clickedCard.classList.remove('active');
+        } else {
+          clickedCard.classList.add('active');
+        }
+      } else {
+        const link = clickedCard.dataset.link;
+        if (link) window.open(link, '_blank', 'noopener');
+      }
+    });
+
+    cards.forEach((card) => {
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          const link = card.dataset.link;
+          if (link) window.open(link, '_blank', 'noopener');
+        }
+      });
+    });
+  }
+
+  initCards();
+</script>

@@ -1,0 +1,40 @@
+---
+import Layout from '../layouts/Layout.astro';
+import FilmCard from '../components/FilmCard.astro';
+import films from '../data/film.json';
+
+const videos = films.filter((f) => f.vimeo_id);
+const posters = films.filter((f) => !f.vimeo_id);
+---
+
+<Layout title="film — adam lilienfeldt" activePage="film">
+  <header class="hero">
+    <p>some films i've worked on</p>
+  </header>
+  <div class="film-grid">
+    <div class="film-col">
+      {videos.map((film) => (
+        <FilmCard
+          title={film.title}
+          role={film.role}
+          year={film.year}
+          link={film.link}
+          cover={film.cover}
+          vimeo_id={film.vimeo_id}
+        />
+      ))}
+    </div>
+    <div class="film-col">
+      {posters.map((film) => (
+        <FilmCard
+          title={film.title}
+          role={film.role}
+          year={film.year}
+          link={film.link}
+          cover={film.cover}
+          vimeo_id={film.vimeo_id}
+        />
+      ))}
+    </div>
+  </div>
+</Layout>

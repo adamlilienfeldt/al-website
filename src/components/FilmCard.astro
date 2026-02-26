@@ -1,0 +1,86 @@
+---
+interface Props {
+  title: string;
+  role?: string;
+  year?: string;
+  link?: string;
+  cover?: string;
+  vimeo_id?: string;
+}
+
+const { title, role, year, link, cover, vimeo_id } = Astro.props;
+const isVideo = Boolean(vimeo_id);
+const hasLink = Boolean(link) && !isVideo;
+---
+
+{isVideo ? (
+  <div class="film-card film-card--video">
+    <div class="film-video-wrapper">
+      <iframe
+        src={`https://player.vimeo.com/video/${vimeo_id}`}
+        allow="autoplay; fullscreen; picture-in-picture"
+        allowfullscreen
+        title={title}
+      />
+    </div>
+    <p class="film-video-title">{title}{role ? ` — ${role}` : ''}</p>
+  </div>
+) : (
+  <div
+    class:list={['film-card film-card--poster card', { 'has-link': hasLink }]}
+    data-link={link || ''}
+    role={hasLink ? 'link' : undefined}
+    tabindex={hasLink ? 0 : undefined}
+    aria-label={hasLink ? `${title} — open link` : undefined}
+  >
+    {cover
+      ? <img src={cover} alt={title} loading="lazy" />
+      : <div class="card-placeholder" aria-hidden="true" />
+    }
+    <div class="card-overlay">
+      <p class="card-heading">{title}</p>
+      {role && <p class="card-credits">{role}</p>}
+      {year && <p class="card-credits">{year}</p>}
+    </div>
+  </div>
+)}
+
+{!isVideo && (
+  <script>
+    function initCards() {
+      const cards = document.querySelectorAll<HTMLElement>('.card');
+      document.addEventListener('click', (e) => {
+        const target = e.target as Element;
+        const clickedCard = target.closest<HTMLElement>('.card');
+        cards.forEach((card) => {
+          if (card === clickedCard) return;
+          card.classList.remove('active');
+        });
+        if (!clickedCard) return;
+        const isTouchDevice = window.matchMedia('(hover: none)').matches;
+        if (isTouchDevice) {
+          const link = clickedCard.dataset.link;
+          if (clickedCard.classList.contains('active')) {
+            if (link) window.open(link, '_blank', 'noopener');
+            clickedCard.classList.remove('active');
+          } else {
+            clickedCard.classList.add('active');
+          }
+        } else {
+          const link = clickedCard.dataset.link;
+          if (link) window.open(link, '_blank', 'noopener');
+        }
+      });
+      cards.forEach((card) => {
+        card.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            const link = card.dataset.link;
+            if (link) window.open(link, '_blank', 'noopener');
+          }
+        });
+      });
+    }
+    initCards();
+  </script>
+)}

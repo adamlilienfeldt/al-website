@@ -1,0 +1,26 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ReleaseCard from '../components/ReleaseCard.astro';
+import releases from '../data/music.json';
+---
+
+<Layout title="music — adam lilienfeldt" activePage="music">
+  <header class="hero">
+    <p>producer, engineer, musician and composer based in copenhagen.</p>
+    <p>reach out at <a href="mailto:lilienfeldt.adam@gmail.com">lilienfeldt.adam@gmail.com</a></p>
+  </header>
+  <div class="grid">
+    {releases.map((release) => (
+      <ReleaseCard
+        artist={release.artist}
+        title={release.title}
+        type={release.type}
+        year={release.year}
+        link={release.link}
+        cover={release.cover}
+        credits={release.credits}
+        label={release.label}
+      />
+    ))}
+  </div>
+</Layout>

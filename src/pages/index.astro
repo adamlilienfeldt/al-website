@@ -2,6 +2,12 @@
 import Layout from '../layouts/Layout.astro';
 import ReleaseCard from '../components/ReleaseCard.astro';
 import releases from '../data/music.json';
+
+const sorted = [...releases].sort((a, b) => {
+  const aOrder = (a as any).order ?? Infinity;
+  const bOrder = (b as any).order ?? Infinity;
+  return aOrder - bOrder;
+});
 ---
 
 <Layout title="music — adam lilienfeldt" activePage="music">
@@ -10,7 +16,7 @@ import releases from '../data/music.json';
     <p>reach out at <a href="mailto:lilienfeldt.adam@gmail.com">lilienfeldt.adam@gmail.com</a></p>
   </header>
   <div class="grid">
-    {releases.map((release) => (
+    {sorted.map((release) => (
       <ReleaseCard
         artist={release.artist}
         title={release.title}

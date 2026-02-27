@@ -18,6 +18,8 @@ const posters = sorted.filter((f) => !f.vimeo_id);
         <FilmCard
           title={film.title}
           role={film.role}
+          director={(film as any).director}
+          film_company={(film as any).film_company}
           year={film.year}
           link={film.link}
           cover={film.cover}
@@ -30,6 +32,8 @@ const posters = sorted.filter((f) => !f.vimeo_id);
         <FilmCard
           title={film.title}
           role={film.role}
+          director={(film as any).director}
+          film_company={(film as any).film_company}
           year={film.year}
           link={film.link}
           cover={film.cover}

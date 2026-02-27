@@ -2,13 +2,15 @@
 interface Props {
   title: string;
   role?: string;
+  director?: string;
+  film_company?: string;
   year?: string;
   link?: string;
   cover?: string;
   vimeo_id?: string;
 }
 
-const { title, role, year, link, cover, vimeo_id } = Astro.props;
+const { title, role, director, film_company, year, link, cover, vimeo_id } = Astro.props;
 const isVideo = Boolean(vimeo_id);
 const hasLink = Boolean(link) && !isVideo;
 ---
@@ -22,8 +24,13 @@ const hasLink = Boolean(link) && !isVideo;
         allowfullscreen
         title={title}
       />
+      <div class="film-video-cover">
+        <p class="film-overlay-title">{title}</p>
+        {role && <p class="film-overlay-meta">{role}</p>}
+        {director && <p class="film-overlay-meta">dir. {director}</p>}
+        {film_company && <p class="film-overlay-meta">{film_company}</p>}
+      </div>
     </div>
-    <p class="film-video-title">{title}{role ? ` — ${role}` : ''}</p>
   </div>
 ) : (
   <div
@@ -40,9 +47,39 @@ const hasLink = Boolean(link) && !isVideo;
     <div class="card-overlay">
       <p class="card-heading">{title}</p>
       {role && <p class="card-credits">{role}</p>}
+      {director && <p class="card-credits">dir. {director}</p>}
+      {film_company && <p class="card-credits">{film_company}</p>}
       {year && <p class="card-credits">{year}</p>}
     </div>
   </div>
+)}
+
+{isVideo && (
+  <script>
+    // Click on visible cover → reveal iframe
+    document.querySelectorAll<HTMLElement>('.film-video-cover').forEach((cover) => {
+      cover.addEventListener('click', () => {
+        cover.closest<HTMLElement>('.film-card--video')?.classList.add('revealed');
+      });
+    });
+
+    // Mobile: tap card area (cover hidden) → show overlay
+    document.querySelectorAll<HTMLElement>('.film-card--video').forEach((card) => {
+      card.addEventListener('click', () => {
+        if (card.classList.contains('revealed')) return;
+        if (!window.matchMedia('(hover: none)').matches) return;
+        if (!card.classList.contains('active')) card.classList.add('active');
+      });
+    });
+
+    // Mobile: dismiss overlay when tapping elsewhere
+    document.addEventListener('click', (e) => {
+      const target = e.target as Element;
+      document.querySelectorAll<HTMLElement>('.film-card--video.active').forEach((card) => {
+        if (!card.contains(target)) card.classList.remove('active');
+      });
+    });
+  </script>
 )}
 
 {!isVideo && (

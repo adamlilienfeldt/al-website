@@ -1,17 +1,17 @@
 [
   {
-    "order": 6,
+    "order": 8,
     "artist": "Kindsight",
     "title": "Swedish Punk",
     "type": "album",
     "year": "",
-   "link": "https://album.link/xhwj3gf0kccsw",
+    "link": "https://album.link/xhwj3gf0kccsw",
     "cover": "/images/kindsight-swedish-punk.jpg",
     "credits": "producer, engineer, mixer, add. instruments",
     "label": "Rama Lama Records"
   },
   {
-    "order": 15,
+    "order": 11,
     "artist": "Kindsight",
     "title": "Love You Baby All the Time",
     "type": "single",
@@ -22,7 +22,7 @@
     "label": "Rama Lama Records"
   },
   {
-    "order": 9,
+    "order": 6,
     "artist": "Slørede Linier",
     "title": "Hele Verden, Altid",
     "type": "album",
@@ -33,7 +33,7 @@
     "label": "Kös"
   },
   {
-    "order": 10,
+    "order": 9,
     "artist": "Slørede Linier",
     "title": "Uendeligt",
     "type": "single",
@@ -44,7 +44,7 @@
     "label": "Kös"
   },
   {
-    "order": 13,
+    "order": 14,
     "artist": "Slørede Linier",
     "title": "Med Tid Vokser Det Fra Os / Venner Lever Tusind År",
     "type": "single",
@@ -55,7 +55,7 @@
     "label": "Kös"
   },
   {
-    "order": 4,
+    "order": 7,
     "artist": "Elvira Alfaro",
     "title": "Human",
     "type": "single",
@@ -66,7 +66,7 @@
     "label": "Capella Records"
   },
   {
-    "order": 11,
+    "order": 10,
     "artist": "Elvira Alfaro",
     "title": "in love with a feeling",
     "type": "EP",
@@ -99,7 +99,7 @@
     "label": "Capella Records"
   },
   {
-    "order": 14,
+    "order": 15,
     "artist": "Vera Decay",
     "title": "Cinders",
     "type": "single",
@@ -121,7 +121,7 @@
     "label": "Sony Music"
   },
   {
-    "order": 5,
+    "order": 12,
     "artist": "Fraads",
     "title": "Hard drive schlappers (tracks 4+5)",
     "type": "album",
@@ -143,7 +143,7 @@
     "label": "Nordic Music Society"
   },
   {
-    "order": 3,
+    "order": 4,
     "artist": "Sara Lina",
     "title": "Brava",
     "type": "single",
@@ -154,7 +154,7 @@
     "label": "Nordic Music Society"
   },
   {
-    "order": 12,
+    "order": 13,
     "artist": "Erik Apollo",
     "title": "Digter",
     "type": "single",
@@ -198,7 +198,7 @@
     "label": ""
   },
   {
-    "order": 7,
+    "order": 5,
     "artist": "Elba",
     "title": "Hvad laver du nu?",
     "type": "single",
@@ -209,7 +209,7 @@
     "label": "Nordic Music Society"
   },
   {
-    "order": 8,
+    "order": 3,
     "artist": "ALAWARI",
     "title": "Leviathan",
     "type": "album",

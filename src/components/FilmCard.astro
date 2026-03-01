@@ -16,7 +16,7 @@ const hasLink = Boolean(link) && !isVideo;
 ---
 
 {isVideo ? (
-  <div class="film-card film-card--video">
+  <div class="film-card film-card--video" data-vimeo={vimeo_id}>
     <div class="film-video-wrapper">
       <iframe
         src={`https://player.vimeo.com/video/${vimeo_id}`}
@@ -56,20 +56,41 @@ const hasLink = Boolean(link) && !isVideo;
 
 {isVideo && (
   <script>
-    // Click on visible cover → reveal iframe
-    document.querySelectorAll<HTMLElement>('.film-video-cover').forEach((cover) => {
-      cover.addEventListener('click', () => {
-        cover.closest<HTMLElement>('.film-card--video')?.classList.add('revealed');
-      });
-    });
+    function revealVideo(card: HTMLElement) {
+      card.classList.remove('active');
+      card.classList.add('revealed');
+    }
 
-    // Mobile: tap card area (cover hidden) → show overlay
     document.querySelectorAll<HTMLElement>('.film-card--video').forEach((card) => {
-      card.addEventListener('click', () => {
-        if (card.classList.contains('revealed')) return;
-        if (!window.matchMedia('(hover: none)').matches) return;
-        if (!card.classList.contains('active')) card.classList.add('active');
-      });
+      const cover = card.querySelector<HTMLElement>('.film-video-cover');
+      if (!cover) return;
+      const isTouchDevice = window.matchMedia('(hover: none)').matches;
+
+      if (isTouchDevice) {
+        // Add a transparent blocker over the iframe to capture taps
+        const blocker = document.createElement('div');
+        blocker.className = 'film-touch-blocker';
+        card.querySelector('.film-video-wrapper')!.appendChild(blocker);
+
+        blocker.addEventListener('click', () => {
+          if (!card.classList.contains('active')) {
+            card.classList.add('active');
+          } else {
+            revealVideo(card);
+          }
+        });
+
+        cover.addEventListener('click', () => {
+          if (card.classList.contains('active')) {
+            revealVideo(card);
+          }
+        });
+      } else {
+        // Desktop: click overlay → reveal and autoplay
+        cover.addEventListener('click', () => {
+          revealVideo(card);
+        });
+      }
     });
 
     // Mobile: dismiss overlay when tapping elsewhere

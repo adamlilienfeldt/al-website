@@ -345,10 +345,22 @@ main {
   }
 }
 
-/* Mobile tap */
+/* Mobile: transparent touch blocker over iframe to capture taps */
+.film-touch-blocker {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.film-card--video.revealed .film-touch-blocker {
+  display: none;
+}
+
+/* Mobile tap active state */
 .film-card--video.active .film-video-cover {
   opacity: 1;
   pointer-events: auto;
+  z-index: 2;
 }
 
 .film-card--video.revealed .film-video-cover {

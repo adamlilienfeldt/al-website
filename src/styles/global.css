@@ -44,7 +44,7 @@ html {
   background: var(--bg);
   color: var(--text);
   font-size: 15px;
-  font-weight: 100;
+  font-weight: 200;
   -webkit-font-smoothing: antialiased;
   /*-webkit-font-smoothing: subpixel-antialiased;*/
 }

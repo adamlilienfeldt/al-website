@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import ReleaseCard from '../components/ReleaseCard.astro';
 import releases from '../data/music.json';
+import { SHOW_PHOTO } from '../config';
 
 const sorted = [...releases].sort((a, b) => {
   const aOrder = (a as any).order ?? Infinity;
@@ -11,9 +12,19 @@ const sorted = [...releases].sort((a, b) => {
 ---
 
 <Layout title="music — adam lilienfeldt" activePage="music">
-  <header class="hero">
-    <p>producer, engineer, musician and composer based in copenhagen.</p>
-    <p>reach out at <a href="mailto:lilienfeldt.adam@gmail.com">lilienfeldt.adam@gmail.com</a></p>
+  <header class:list={["hero", { "hero--with-photo": SHOW_PHOTO }]}>
+    {SHOW_PHOTO && (
+      <>
+        <img class="hero-photo" src="/images/_DSC5353-1.jpeg" alt="adam lilienfeldt" id="hero-photo-thumb" />
+        <div class="photo-modal" id="photo-modal">
+          <img src="/images/_DSC5353-1.jpeg" alt="adam lilienfeldt" />
+        </div>
+      </>
+    )}
+    <div class="hero-text">
+      <p>producer, engineer, musician and composer based in copenhagen.</p>
+      <p>reach out at <a href="mailto:lilienfeldt.adam@gmail.com">lilienfeldt.adam@gmail.com</a></p>
+    </div>
   </header>
   <div class="grid">
     {sorted.map((release) => (
@@ -30,3 +41,15 @@ const sorted = [...releases].sort((a, b) => {
     ))}
   </div>
 </Layout>
+
+<script>
+  const thumb = document.getElementById('hero-photo-thumb');
+  const modal = document.getElementById('photo-modal');
+  if (thumb && modal) {
+    thumb.addEventListener('click', () => modal.classList.add('open'));
+    modal.addEventListener('click', () => modal.classList.remove('open'));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') modal.classList.remove('open');
+    });
+  }
+</script>

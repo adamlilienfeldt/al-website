@@ -137,6 +137,44 @@ main {
   color: var(--text);
 }
 
+/* ─── Hero photo ──────────────────────────────────────── */
+
+.hero--with-photo {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.hero-photo {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  object-position: center top;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.photo-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.85);
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.photo-modal.open {
+  display: flex;
+}
+
+.photo-modal img {
+  max-width: min(480px, 90vw);
+  max-height: 90vh;
+  object-fit: contain;
+}
+
 /* ─── Music grid ──────────────────────────────────────── */
 
 .grid {

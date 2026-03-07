@@ -4,9 +4,10 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "node fetch-covers.js && astro build",
     "preview": "astro preview",
-    "admin": "node admin.js"
+    "admin": "node admin.js",
+    "fetch-covers": "node fetch-covers.js"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.6",

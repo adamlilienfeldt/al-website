@@ -8,6 +8,7 @@ interface Props {
 }
 
 const { title, activePage } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 
 <!doctype html>
@@ -21,10 +22,10 @@ const { title, activePage } = Astro.props;
   </head>
   <body>
     <nav>
-      <a href="/" class="nav-heading">adam lilienfeldt</a>
+      <a href={`${base}/`} class="nav-heading">adam lilienfeldt</a>
       <ul class="nav-links">
-        <li><a href="/" class:list={[{ active: activePage === 'music' }]}>music</a></li>
-        <li><a href="/film" class:list={[{ active: activePage === 'film' }]}>film</a></li>
+        <li><a href={`${base}/`} class:list={[{ active: activePage === 'music' }]}>music</a></li>
+        <li><a href={`${base}/film`} class:list={[{ active: activePage === 'film' }]}>film</a></li>
       </ul>
     </nav>
 

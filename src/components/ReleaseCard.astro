@@ -1,5 +1,4 @@
 ---
-import { Image } from 'astro:assets';
 import { SHOW_TYPE, SHOW_YEAR, SHOW_CREDITS, SHOW_LABEL } from '../config';
 
 interface Props {
@@ -15,6 +14,8 @@ interface Props {
 
 const { artist, title, type, year, link, cover, credits, label } = Astro.props;
 const hasLink = Boolean(link);
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const coverSrc = cover && !cover.startsWith('http') ? `${base}${cover}` : cover;
 ---
 
 <div
@@ -24,10 +25,8 @@ const hasLink = Boolean(link);
   tabindex={hasLink ? 0 : undefined}
   aria-label={hasLink ? `${title} by ${artist} — open on streaming` : undefined}
 >
-  {cover
-    ? cover.startsWith('http')
-      ? <img src={cover} alt={`${title} by ${artist}`} loading="lazy" />
-      : <Image src={cover} width={600} height={600} alt={`${title} by ${artist}`} loading="lazy" />
+  {coverSrc
+    ? <img src={coverSrc} alt={`${title} by ${artist}`} loading="lazy" />
     : <div class="card-placeholder" aria-hidden="true" />
   }
 

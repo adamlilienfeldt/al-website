@@ -13,8 +13,7 @@ interface Props {
 const { title, role, director, film_company, year, link, cover, vimeo_id } = Astro.props;
 const isVideo = Boolean(vimeo_id);
 const hasLink = Boolean(link) && !isVideo;
-const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-const coverSrc = cover && !cover.startsWith('http') ? `${base}${cover}` : cover;
+const coverSrc = cover;
 ---
 
 {isVideo ? (

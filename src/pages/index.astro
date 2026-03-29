@@ -4,8 +4,6 @@ import ReleaseCard from '../components/ReleaseCard.astro';
 import releases from '../data/music.json';
 import { SHOW_PHOTO } from '../config';
 
-const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-
 const sorted = [...releases].sort((a, b) => {
   const aOrder = (a as any).order ?? Infinity;
   const bOrder = (b as any).order ?? Infinity;
@@ -17,9 +15,9 @@ const sorted = [...releases].sort((a, b) => {
   <header class:list={["hero", { "hero--with-photo": SHOW_PHOTO }]}>
     {SHOW_PHOTO && (
       <>
-        <img class="hero-photo" src={`${base}/images/_DSC5353-1.jpeg`} alt="adam lilienfeldt" id="hero-photo-thumb" />
+        <img class="hero-photo" src="/images/_DSC5353-1.jpeg" alt="adam lilienfeldt" id="hero-photo-thumb" />
         <div class="photo-modal" id="photo-modal">
-          <img src={`${base}/images/_DSC5353-1.jpeg`} alt="adam lilienfeldt" />
+          <img src="/images/_DSC5353-1.jpeg" alt="adam lilienfeldt" />
         </div>
       </>
     )}

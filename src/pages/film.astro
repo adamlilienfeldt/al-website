@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import FilmCard from '../components/FilmCard.astro';
 import films from '../data/film.json';
+import { resolveCover } from '../lib/covers';
 
 const sorted = [...films].sort((a, b) => ((a as any).order ?? Infinity) - ((b as any).order ?? Infinity));
 const videos = sorted.filter((f) => f.vimeo_id);
@@ -22,7 +23,7 @@ const posters = sorted.filter((f) => !f.vimeo_id);
           film_company={(film as any).film_company}
           year={film.year}
           link={film.link}
-          cover={film.cover}
+          cover={resolveCover(film.cover)}
           vimeo_id={film.vimeo_id}
         />
       ))}
@@ -36,7 +37,7 @@ const posters = sorted.filter((f) => !f.vimeo_id);
           film_company={(film as any).film_company}
           year={film.year}
           link={film.link}
-          cover={film.cover}
+          cover={resolveCover(film.cover)}
           vimeo_id={film.vimeo_id}
         />
       ))}

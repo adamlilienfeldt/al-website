@@ -19,11 +19,14 @@ dist/
 # Astro
 .astro/
 
-# reference images
+# Stray reference images dropped anywhere are ignored; committed site
+# assets live under public/ and src/assets/.
 *.jpg
 *.jpeg
 *.png
 !public/**/*.jpg
 !public/**/*.jpeg
 !public/**/*.png
-public/images/_DSC5353-1.jpeg
+!src/assets/**/*.jpg
+!src/assets/**/*.jpeg
+!src/assets/**/*.png

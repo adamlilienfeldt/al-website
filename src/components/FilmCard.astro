@@ -1,4 +1,7 @@
 ---
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
 interface Props {
   title: string;
   role?: string;
@@ -6,7 +9,7 @@ interface Props {
   film_company?: string;
   year?: string;
   link?: string;
-  cover?: string;
+  cover?: ImageMetadata;
   vimeo_id?: string;
 }
 
@@ -42,7 +45,14 @@ const coverSrc = cover;
     aria-label={hasLink ? `${title} — open link` : undefined}
   >
     {coverSrc
-      ? <img src={coverSrc} alt={title} loading="lazy" />
+      ? <Picture
+          src={coverSrc}
+          formats={['avif', 'webp']}
+          widths={[300, 600]}
+          sizes="(max-width: 900px) 100vw, 50vw"
+          alt={title}
+          loading="lazy"
+        />
       : <div class="card-placeholder" aria-hidden="true" />
     }
     <div class="card-overlay">

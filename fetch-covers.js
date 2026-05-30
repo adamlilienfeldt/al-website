@@ -10,7 +10,10 @@ const MAX_EDGE = 660;
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const MUSIC_JSON = join(__dirname, 'src/data/music.json');
-const IMAGES_DIR = join(__dirname, 'public/images');
+// Covers live in src/assets so astro:assets can optimize them at build time.
+// The `cover` field keeps its historical "/images/<file>" form as a logical
+// key; resolveCover() in src/lib/covers.ts matches on the bare filename.
+const IMAGES_DIR = join(__dirname, 'src/assets/covers');
 
 function slugify(str) {
   return str.toLowerCase()

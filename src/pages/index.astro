@@ -1,8 +1,11 @@
 ---
+import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import ReleaseCard from '../components/ReleaseCard.astro';
 import releases from '../data/music.json';
+import { resolveCover } from '../lib/covers';
 import { SHOW_PHOTO } from '../config';
+import heroPhoto from '../assets/_DSC5353-1.jpeg';
 
 const sorted = [...releases].sort((a, b) => {
   const aOrder = (a as any).order ?? Infinity;
@@ -15,9 +18,9 @@ const sorted = [...releases].sort((a, b) => {
   <header class:list={["hero", { "hero--with-photo": SHOW_PHOTO }]}>
     {SHOW_PHOTO && (
       <>
-        <img class="hero-photo" src="/images/_DSC5353-1.jpeg" alt="adam lilienfeldt" id="hero-photo-thumb" />
+        <Image class="hero-photo" src={heroPhoto} alt="adam lilienfeldt" id="hero-photo-thumb" width={192} />
         <div class="photo-modal" id="photo-modal">
-          <img src="/images/_DSC5353-1.jpeg" alt="adam lilienfeldt" />
+          <Image src={heroPhoto} alt="adam lilienfeldt" width={960} />
         </div>
       </>
     )}
@@ -34,7 +37,7 @@ const sorted = [...releases].sort((a, b) => {
         type={release.type}
         year={release.year}
         link={release.link}
-        cover={release.cover}
+        cover={resolveCover(release.cover)}
         credits={release.credits}
         label={release.label}
       />

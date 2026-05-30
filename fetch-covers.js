@@ -1,9 +1,12 @@
 #!/usr/bin/env node
 
-import { readFileSync, writeFileSync, createWriteStream, existsSync } from 'fs';
-import { pipeline } from 'stream/promises';
+import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import sharp from 'sharp';
+
+// Covers render in a ~330px grid cell (≤660px @2x), so cap the long edge at 660px.
+const MAX_EDGE = 660;
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const MUSIC_JSON = join(__dirname, 'src/data/music.json');
@@ -27,7 +30,12 @@ async function fetchThumbnailUrl(link) {
 async function downloadImage(imageUrl, destPath) {
   const res = await fetch(imageUrl);
   if (!res.ok) throw new Error(`Failed to download ${imageUrl}`);
-  await pipeline(res.body, createWriteStream(destPath));
+  const input = Buffer.from(await res.arrayBuffer());
+  const output = await sharp(input)
+    .resize({ width: MAX_EDGE, height: MAX_EDGE, fit: 'inside', withoutEnlargement: true })
+    .jpeg({ quality: 82, mozjpeg: true })
+    .toBuffer();
+  writeFileSync(destPath, output);
 }
 
 async function main() {

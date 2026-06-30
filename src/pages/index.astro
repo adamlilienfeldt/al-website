@@ -37,6 +37,7 @@ const sorted = [...releases].sort((a, b) => {
         type={release.type}
         year={release.year}
         link={release.link}
+        services={(release as any).services}
         cover={resolveCover(release.cover)}
         credits={release.credits}
         label={release.label}

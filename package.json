@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "node fetch-covers.js && astro build",
+    "build": "astro build",
     "preview": "astro preview",
     "admin": "node admin.js",
     "fetch-covers": "node fetch-covers.js"

@@ -21,13 +21,41 @@ function slugify(str) {
     .replace(/(^-|-$)/g, '');
 }
 
-async function fetchThumbnailUrl(link) {
+// Odesli platform key -> our stable service key, in display order. Only these
+// are persisted; anything else Odesli returns is dropped.
+const PLATFORMS = [
+  ['spotify', 'spotify'],
+  ['appleMusic', 'appleMusic'],
+  ['youtubeMusic', 'youtubeMusic'],
+  ['youtube', 'youtube'],
+  ['tidal', 'tidal'],
+];
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// One Odesli lookup returns both the cover thumbnail and the per-service links.
+// Odesli's free tier is ~10 req/min, so retry on 429 with backoff.
+async function fetchOdesli(link) {
   const url = `https://api.song.link/v1-alpha.1/links?url=${encodeURIComponent(link)}`;
-  const res = await fetch(url);
+  let res;
+  for (let attempt = 0; attempt < 4; attempt++) {
+    res = await fetch(url);
+    if (res.status !== 429) break;
+    const wait = 2000 * (attempt + 1);
+    console.log(`    rate-limited, retrying in ${wait / 1000}s`);
+    await sleep(wait);
+  }
   if (!res.ok) throw new Error(`Odesli API error ${res.status} for ${link}`);
   const data = await res.json();
   const entity = Object.values(data.entitiesByUniqueId)[0];
-  return entity?.thumbnailUrl;
+
+  const services = {};
+  for (const [odesliKey, ourKey] of PLATFORMS) {
+    const url = data.linksByPlatform?.[odesliKey]?.url;
+    if (url) services[ourKey] = url;
+  }
+
+  return { thumbnailUrl: entity?.thumbnailUrl, services };
 }
 
 async function downloadImage(imageUrl, destPath) {
@@ -46,7 +74,10 @@ async function main() {
   let changed = false;
 
   for (const release of releases) {
-    if (release.cover) continue;
+    const needsCover = !release.cover;
+    const needsServices = !release.services || Object.keys(release.services).length === 0;
+    if (!needsCover && !needsServices) continue;
+
     const apiUrl = release.spotify || release.link;
     if (!apiUrl) continue;
 
@@ -55,27 +86,43 @@ async function main() {
     const localPath = `/images/${filename}`;
     const destPath = join(IMAGES_DIR, filename);
 
-    if (existsSync(destPath)) {
+    // Cover already on disk — set the field without re-hitting Odesli, but
+    // still fall through to fetch services if those are missing.
+    if (needsCover && existsSync(destPath)) {
       console.log(`  exists: ${filename}, setting cover`);
       release.cover = localPath;
       changed = true;
-      continue;
     }
+
+    const stillNeedsCover = !release.cover;
+    if (!stillNeedsCover && !needsServices) continue;
 
     console.log(`  fetching: ${release.artist} — ${release.title}`);
     try {
-      const thumbUrl = await fetchThumbnailUrl(apiUrl);
-      if (!thumbUrl) {
-        console.log(`    no thumbnail found, skipping`);
-        continue;
+      const { thumbnailUrl, services } = await fetchOdesli(apiUrl);
+
+      if (stillNeedsCover) {
+        if (thumbnailUrl) {
+          await downloadImage(thumbnailUrl, destPath);
+          release.cover = localPath;
+          changed = true;
+          console.log(`    saved: ${filename}`);
+        } else {
+          console.log(`    no thumbnail found`);
+        }
       }
-      await downloadImage(thumbUrl, destPath);
-      release.cover = localPath;
-      changed = true;
-      console.log(`    saved: ${filename}`);
+
+      if (needsServices && Object.keys(services).length) {
+        release.services = services;
+        changed = true;
+        console.log(`    services: ${Object.keys(services).join(', ')}`);
+      }
     } catch (err) {
       console.error(`    error: ${err.message}`);
     }
+
+    // Stay under Odesli's free-tier rate limit (~10 req/min).
+    await sleep(7000);
   }
 
   if (changed) {

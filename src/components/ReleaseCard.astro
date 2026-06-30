@@ -9,19 +9,21 @@ interface Props {
   type?: string;
   year?: string;
   link?: string;
+  services?: Record<string, string>;
   cover?: ImageMetadata;
   credits?: string;
   label?: string;
 }
 
-const { artist, title, type, year, link, cover, credits, label } = Astro.props;
-const hasLink = Boolean(link);
+const { artist, title, type, year, link, services, cover, credits, label } = Astro.props;
+const hasLink = Boolean(link) || Boolean(services && Object.keys(services).length);
 const coverSrc = cover;
 ---
 
 <div
   class:list={['card', { 'has-link': hasLink }]}
   data-link={link || ''}
+  data-services={services && Object.keys(services).length ? JSON.stringify(services) : ''}
   role={hasLink ? 'link' : undefined}
   tabindex={hasLink ? 0 : undefined}
   aria-label={hasLink ? `${title} by ${artist} — open on streaming` : undefined}
@@ -64,36 +66,54 @@ const coverSrc = cover;
       modal.innerHTML = `
         <div class="odesli-modal-content">
           <button class="odesli-modal-close" aria-label="Close">&times;</button>
-          <div class="odesli-loader">loading…</div>
-          <iframe src="" frameborder="0" allowfullscreen
-            sandbox="allow-same-origin allow-scripts allow-presentation allow-popups allow-popups-to-escape-sandbox"
-            allow="clipboard-read; clipboard-write"></iframe>
+          <div class="odesli-services"></div>
         </div>`;
       document.body.appendChild(modal);
     }
 
-    const iframe = modal.querySelector('iframe') as HTMLIFrameElement;
+    const servicesEl = modal.querySelector('.odesli-services') as HTMLElement;
     const closeBtn = modal.querySelector('.odesli-modal-close') as HTMLElement;
-    const loader = modal.querySelector('.odesli-loader') as HTMLElement;
 
-    iframe.addEventListener('load', () => {
-      if (iframe.src) {
-        loader.style.display = 'none';
-        iframe.style.display = '';
+    // Display label per service key (order = listing order).
+    const SERVICE_LABELS: Record<string, string> = {
+      spotify: 'Spotify',
+      appleMusic: 'Apple Music',
+      youtubeMusic: 'YouTube Music',
+      youtube: 'YouTube',
+      tidal: 'Tidal',
+    };
+
+    function openModal(services: Record<string, string>, fallback: string) {
+      const entries = Object.entries(SERVICE_LABELS)
+        .filter(([key]) => services[key])
+        .map(([key, label]) => ({ label, url: services[key] }));
+
+      // No baked-in services — fall back to the original (song.link) link.
+      if (entries.length === 0 && fallback) {
+        entries.push({ label: 'Open in streaming app', url: fallback });
       }
-    });
 
-    function openModal(link: string) {
-      loader.style.display = '';
-      iframe.style.display = 'none';
-      const encoded = encodeURIComponent(link);
-      iframe.src = `https://odesli.co/embed/?url=${encoded}&theme=light`;
+      servicesEl.innerHTML = entries
+        .map(
+          (e) =>
+            `<a class="odesli-service" href="${e.url}" target="_blank" rel="noopener noreferrer">${e.label}</a>`,
+        )
+        .join('');
       modal!.classList.add('open');
     }
 
     function closeModal() {
       modal!.classList.remove('open');
-      iframe.src = '';
+    }
+
+    // Pull services + fallback link off a card and open the picker.
+    function openFromCard(card: HTMLElement) {
+      const link = card.dataset.link || '';
+      let services: Record<string, string> = {};
+      try {
+        services = card.dataset.services ? JSON.parse(card.dataset.services) : {};
+      } catch {}
+      if (link || Object.keys(services).length) openModal(services, link);
     }
 
     closeBtn.addEventListener('click', closeModal);
@@ -118,16 +138,14 @@ const coverSrc = cover;
       const isTouchDevice = window.matchMedia('(hover: none)').matches;
 
       if (isTouchDevice) {
-        const link = clickedCard.dataset.link;
         if (clickedCard.classList.contains('active')) {
-          if (link) openModal(link);
+          openFromCard(clickedCard);
           clickedCard.classList.remove('active');
         } else {
           clickedCard.classList.add('active');
         }
       } else {
-        const link = clickedCard.dataset.link;
-        if (link) openModal(link);
+        openFromCard(clickedCard);
       }
     });
 
@@ -135,8 +153,7 @@ const coverSrc = cover;
       card.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          const link = card.dataset.link;
-          if (link) openModal(link);
+          openFromCard(card);
         }
       });
     });

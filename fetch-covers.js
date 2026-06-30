@@ -70,12 +70,19 @@ async function downloadImage(imageUrl, destPath) {
 }
 
 async function main() {
+  // --force re-fetches service links even when already present (covers are
+  // still skipped if on disk). Used to enrich thin/partial service data.
+  const force = process.argv.includes('--force');
+  // Odesli free tier rate-limits aggressively; default 7s, --force uses 12s.
+  const throttleMs = force ? 12000 : 7000;
+
   const releases = JSON.parse(readFileSync(MUSIC_JSON, 'utf-8'));
   let changed = false;
 
   for (const release of releases) {
     const needsCover = !release.cover;
-    const needsServices = !release.services || Object.keys(release.services).length === 0;
+    const needsServices =
+      force || !release.services || Object.keys(release.services).length === 0;
     if (!needsCover && !needsServices) continue;
 
     const apiUrl = release.spotify || release.link;
@@ -112,17 +119,22 @@ async function main() {
         }
       }
 
-      if (needsServices && Object.keys(services).length) {
+      // On --force, never overwrite richer existing data with a thinner
+      // (e.g. partial/transient) response.
+      const existingCount = Object.keys(release.services || {}).length;
+      if (Object.keys(services).length > 0 && Object.keys(services).length >= existingCount) {
         release.services = services;
         changed = true;
         console.log(`    services: ${Object.keys(services).join(', ')}`);
+      } else if (Object.keys(services).length) {
+        console.log(`    keeping existing (${existingCount}) over thinner (${Object.keys(services).length})`);
       }
     } catch (err) {
       console.error(`    error: ${err.message}`);
     }
 
     // Stay under Odesli's free-tier rate limit (~10 req/min).
-    await sleep(7000);
+    await sleep(throttleMs);
   }
 
   if (changed) {

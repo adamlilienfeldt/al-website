@@ -74,29 +74,45 @@ const coverSrc = cover;
     const servicesEl = modal.querySelector('.odesli-services') as HTMLElement;
     const closeBtn = modal.querySelector('.odesli-modal-close') as HTMLElement;
 
-    // Display label per service key (order = listing order).
-    const SERVICE_LABELS: Record<string, string> = {
-      spotify: 'Spotify',
-      appleMusic: 'Apple Music',
-      youtubeMusic: 'YouTube Music',
-      youtube: 'YouTube',
-      tidal: 'Tidal',
+    // Brand icon (inline SVG, currentColor) + label per service key.
+    // Order here = listing order in the picker.
+    const SERVICES: Record<string, { label: string; icon: string }> = {
+      spotify: {
+        label: 'Spotify',
+        icon: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.5 17.32a.75.75 0 01-1.03.25c-2.82-1.72-6.36-2.11-10.54-1.16a.75.75 0 11-.33-1.46c4.57-1.04 8.49-.59 11.65 1.34.35.22.46.68.25 1.03zm1.47-3.27a.94.94 0 01-1.29.31c-3.23-1.98-8.15-2.56-11.97-1.4a.94.94 0 11-.54-1.8c4.37-1.32 9.79-.67 13.5 1.6.44.27.58.85.3 1.29zm.13-3.4C15.32 8.4 8.74 8.18 4.98 9.32a1.13 1.13 0 11-.65-2.16c4.32-1.31 11.58-1.06 16.15 1.65a1.13 1.13 0 01-1.15 1.94z"/></svg>',
+      },
+      appleMusic: {
+        label: 'Apple Music',
+        icon: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.99 6.12c0-.5-.05-1-.16-1.49a4.94 4.94 0 00-.54-1.4 4.74 4.74 0 00-2.05-1.94c-.46-.23-.94-.38-1.44-.46-.5-.09-1-.12-1.5-.13H5.21c-.18 0-.36.01-.54.02-.39.02-.78.06-1.16.16-.57.14-1.1.37-1.59.71a4.73 4.73 0 00-1.66 2.02c-.19.45-.31.92-.37 1.4-.05.39-.07.78-.08 1.17v11.65c0 .5.05 1 .16 1.49.13.59.36 1.14.71 1.64a4.73 4.73 0 002.02 1.66c.45.19.92.31 1.4.37.39.05.78.07 1.17.08H18.79c.5 0 1-.05 1.49-.16a4.78 4.78 0 002.02-1.06 4.74 4.74 0 001.36-1.96c.16-.46.26-.94.31-1.43.03-.31.04-.62.04-.93V6.12zM17.6 9.36v6.4a2.5 2.5 0 01-.13.86 2 2 0 01-1.3 1.24c-.27.09-.55.13-.83.16-.54.05-1.05-.05-1.5-.36a1.95 1.95 0 01-.85-1.36 2.02 2.02 0 01.83-2 2.65 2.65 0 011.04-.43l1.18-.24c.16-.04.27-.13.32-.29.01-.05.02-.1.02-.16V8.07c0-.07-.01-.13-.05-.18-.06-.08-.14-.1-.23-.08l-.18.03-5.3 1.07-.27.06c-.18.05-.28.18-.29.37v8.15c0 .3-.04.59-.16.86a2 2 0 01-1.3 1.13c-.27.09-.55.13-.83.16-.54.05-1.05-.05-1.5-.36a1.95 1.95 0 01-.85-1.36 2.02 2.02 0 01.83-2c.31-.24.66-.38 1.04-.43l1.18-.24c.16-.04.27-.13.32-.29.01-.05.02-.1.02-.16V6.92c0-.13.01-.26.05-.39.07-.24.24-.39.48-.44l.36-.08 6.6-1.33c.05-.01.1-.02.16-.02.27-.01.45.16.45.44v4.26z"/></svg>',
+      },
+      youtubeMusic: {
+        label: 'YouTube Music',
+        icon: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm0 19.5c-4.14 0-7.5-3.36-7.5-7.5S7.86 4.5 12 4.5s7.5 3.36 7.5 7.5-3.36 7.5-7.5 7.5zM9.75 8.25v7.5L16 12l-6.25-3.75z"/></svg>',
+      },
+      youtube: {
+        label: 'YouTube',
+        icon: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3.02 3.02 0 00-2.12-2.14C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.38.51A3.02 3.02 0 00.5 6.2C0 8.07 0 12 0 12s0 3.93.5 5.8a3.02 3.02 0 002.12 2.14c1.88.51 9.38.51 9.38.51s7.5 0 9.38-.51a3.02 3.02 0 002.12-2.14C24 15.93 24 12 24 12s0-3.93-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z"/></svg>',
+      },
+      tidal: {
+        label: 'Tidal',
+        icon: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.012 3.992L8.008 7.996 4.004 3.992 0 7.996 4.004 12l4.004-4.004L12.012 12l-4.004 4.004 4.004 4.004 4.004-4.004L12.016 12l4.004-4.004 4.004 4.004L24 7.996l-4.004-4.004-4.004 4.004z"/></svg>',
+      },
     };
 
     function openModal(services: Record<string, string>, fallback: string) {
-      const entries = Object.entries(SERVICE_LABELS)
+      const entries = Object.entries(SERVICES)
         .filter(([key]) => services[key])
-        .map(([key, label]) => ({ label, url: services[key] }));
+        .map(([key, meta]) => ({ label: meta.label, icon: meta.icon, url: services[key] }));
 
       // No baked-in services — fall back to the original (song.link) link.
       if (entries.length === 0 && fallback) {
-        entries.push({ label: 'Open in streaming app', url: fallback });
+        entries.push({ label: 'Open in streaming app', icon: '', url: fallback });
       }
 
       servicesEl.innerHTML = entries
         .map(
           (e) =>
-            `<a class="odesli-service" href="${e.url}" target="_blank" rel="noopener noreferrer">${e.label}</a>`,
+            `<a class="odesli-service${e.icon ? ' has-icon' : ''}" href="${e.url}" target="_blank" rel="noopener noreferrer" aria-label="${e.label}" title="${e.label}">${e.icon || e.label}</a>`,
         )
         .join('');
       modal!.classList.add('open');

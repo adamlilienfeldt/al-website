@@ -50,6 +50,52 @@ function deepFind(obj, key) {
   return undefined;
 }
 
+// Odesli often fails to map Apple Music for smaller releases (the platform is
+// listed but empty). The free iTunes Search API resolves most of them by
+// artist+title. Returns a music.apple.com URL or null.
+function normKey(s) {
+  return String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
+async function itunesSearch(artist, title, entity) {
+  const term = encodeURIComponent(`${artist} ${title}`);
+  const url = `https://itunes.apple.com/search?term=${term}&entity=${entity}&limit=8`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return [];
+    return (await res.json()).results || [];
+  } catch {
+    return [];
+  }
+}
+
+function matchApple(results, artist, title) {
+  const na = normKey(artist);
+  const key = normKey(title).slice(0, 12);
+  for (const r of results) {
+    const ra = normKey(r.artistName);
+    if (!(ra === na || na.includes(ra) || ra.includes(na))) continue;
+    const rt = normKey(r.collectionName) + normKey(r.trackName);
+    if (key && rt.includes(key)) {
+      const link = r.trackViewUrl || r.collectionViewUrl;
+      if (link) return link.split('?')[0];
+    }
+  }
+  return null;
+}
+
+async function fetchAppleMusic(artist, title, type) {
+  const entity = type === 'album' ? 'album' : 'song';
+  // Try the full title, then the part before a "/" (split-single titles).
+  const titles = [title];
+  if (title.includes('/')) titles.push(title.split('/')[0].trim());
+  for (const t of titles) {
+    const link = matchApple(await itunesSearch(artist, t, entity), artist, t);
+    if (link) return link;
+  }
+  return null;
+}
+
 // Scrape the public song.link / album.link page rather than the API. The page
 // embeds the full link set (incl. YouTube/Apple) in __NEXT_DATA__ and isn't
 // subject to the API's aggressive 429 throttle — it also resolves Odesli's own
@@ -167,6 +213,17 @@ async function main() {
         console.log(`    services: ${Object.keys(services).join(', ')}`);
       } else if (Object.keys(services).length) {
         console.log(`    keeping existing (${existingCount}) over thinner (${Object.keys(services).length})`);
+      }
+
+      // Apple Music fallback: Odesli misses it for many small releases, but the
+      // iTunes Search API usually has it. Only fill if still absent.
+      if (!release.services?.appleMusic) {
+        const apple = await fetchAppleMusic(release.artist, release.title, release.type);
+        if (apple) {
+          release.services = { ...(release.services || {}), appleMusic: apple };
+          changed = true;
+          console.log(`    apple (itunes): ${apple}`);
+        }
       }
     } catch (err) {
       console.error(`    error: ${err.message}`);

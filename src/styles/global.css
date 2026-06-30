@@ -478,13 +478,37 @@ footer {
   padding: 4px;
 }
 
+/* Modal inner stack: cover + title + icon row */
 .odesli-services {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.odesli-modal-cover {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.odesli-modal-title {
+  font-size: 14px;
+  font-weight: 100;
+  color: #111;
+  text-align: center;
+  max-width: 240px;
+}
+
+/* Row of service icons (modal) */
+.odesli-services-row {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
   gap: 18px;
-  padding: 8px 4px;
+  padding: 4px;
 }
 
 .odesli-service {
@@ -510,6 +534,43 @@ footer {
 .odesli-service:hover {
   color: #555;
   transform: scale(1.12);
+}
+
+/* ─── Service overlay (icons over the cover, on click) ─── */
+.card-services {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 16px;
+  background: var(--overlay-bg, rgba(0, 0, 0, 0.72));
+  animation: card-services-in 0.15s ease;
+}
+
+@keyframes card-services-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Icons sit on the dark scrim → light, brand-neutral */
+.card-services .odesli-service {
+  color: #fff;
+}
+.card-services .odesli-service:hover {
+  color: #ccc;
+}
+.card-services .odesli-service.has-icon {
+  width: clamp(26px, 16cqw, 38px);
+  height: clamp(26px, 16cqw, 38px);
+}
+
+/* Hide the hover info overlay while the picker is open */
+.card.services-open .card-overlay {
+  opacity: 0 !important;
 }
 
 /* Text fallback link keeps a button look. */

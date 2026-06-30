@@ -99,37 +99,73 @@ const coverSrc = cover;
       },
     };
 
-    function openModal(services: Record<string, string>, fallback: string) {
+    // Picker presentation: 'overlay' (icons over the clicked cover) or
+    // 'modal' (centered popup with cover + title). Flip to compare.
+    const MODE: 'overlay' | 'modal' = 'modal';
+
+    // Build the <a> service links for a card; empty string if nothing to show.
+    function buildLinks(services: Record<string, string>, fallback: string): string {
       const entries = Object.entries(SERVICES)
         .filter(([key]) => services[key])
         .map(([key, meta]) => ({ label: meta.label, icon: meta.icon, url: services[key] }));
-
-      // No baked-in services — fall back to the original (song.link) link.
       if (entries.length === 0 && fallback) {
         entries.push({ label: 'Open in streaming app', icon: '', url: fallback });
       }
-
-      servicesEl.innerHTML = entries
+      return entries
         .map(
           (e) =>
             `<a class="odesli-service${e.icon ? ' has-icon' : ''}" href="${e.url}" target="_blank" rel="noopener noreferrer" aria-label="${e.label}" title="${e.label}">${e.icon || e.label}</a>`,
         )
         .join('');
-      modal!.classList.add('open');
     }
 
-    function closeModal() {
-      modal!.classList.remove('open');
-    }
-
-    // Pull services + fallback link off a card and open the picker.
-    function openFromCard(card: HTMLElement) {
+    function cardData(card: HTMLElement) {
       const link = card.dataset.link || '';
       let services: Record<string, string> = {};
       try {
         services = card.dataset.services ? JSON.parse(card.dataset.services) : {};
       } catch {}
-      if (link || Object.keys(services).length) openModal(services, link);
+      return { link, services, has: !!link || Object.keys(services).length > 0 };
+    }
+
+    // ── Modal presentation ───────────────────────────────
+    function openModal(card: HTMLElement) {
+      const { link, services } = cardData(card);
+      const img = card.querySelector('img');
+      const heading = card.querySelector('.card-heading')?.textContent || '';
+      const thumb = img ? `<img class="odesli-modal-cover" src="${img.currentSrc || img.src}" alt="">` : '';
+      const titleEl = heading ? `<p class="odesli-modal-title">${heading}</p>` : '';
+      servicesEl.innerHTML = thumb + titleEl + `<div class="odesli-services-row">${buildLinks(services, link)}</div>`;
+      modal!.classList.add('open');
+    }
+    function closeModal() {
+      modal!.classList.remove('open');
+    }
+
+    // ── Overlay presentation (icons over the cover) ──────
+    let openCard: HTMLElement | null = null;
+    function closeOverlay() {
+      if (openCard) {
+        openCard.querySelector('.card-services')?.remove();
+        openCard.classList.remove('services-open');
+        openCard = null;
+      }
+    }
+    function openOverlay(card: HTMLElement) {
+      closeOverlay();
+      const { link, services } = cardData(card);
+      const el = document.createElement('div');
+      el.className = 'card-services';
+      el.innerHTML = buildLinks(services, link);
+      card.appendChild(el);
+      card.classList.add('services-open');
+      openCard = card;
+    }
+
+    function openFromCard(card: HTMLElement) {
+      if (!cardData(card).has) return;
+      if (MODE === 'modal') openModal(card);
+      else openOverlay(card);
     }
 
     closeBtn.addEventListener('click', closeModal);
@@ -137,11 +173,14 @@ const coverSrc = cover;
       if (e.target === modal) closeModal();
     });
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeModal();
+      if (e.key === 'Escape') { closeModal(); closeOverlay(); }
     });
 
     document.addEventListener('click', (e) => {
       const target = e.target as Element;
+      // Clicks on a service link should pass through, not toggle.
+      if (target.closest('.card-services')) return;
+
       const clickedCard = target.closest<HTMLElement>('.card');
 
       cards.forEach((card) => {
@@ -149,11 +188,20 @@ const coverSrc = cover;
         card.classList.remove('active');
       });
 
-      if (!clickedCard) return;
+      // Clicking away from any card closes an open overlay.
+      if (!clickedCard) { closeOverlay(); return; }
+
+      // If this card's overlay is already open, a second click closes it.
+      if (MODE === 'overlay' && clickedCard === openCard) {
+        closeOverlay();
+        return;
+      }
 
       const isTouchDevice = window.matchMedia('(hover: none)').matches;
 
-      if (isTouchDevice) {
+      // On touch, the first tap reveals the info overlay (.active); a second
+      // tap opens the picker. Desktop opens immediately on click.
+      if (isTouchDevice && MODE === 'modal') {
         if (clickedCard.classList.contains('active')) {
           openFromCard(clickedCard);
           clickedCard.classList.remove('active');

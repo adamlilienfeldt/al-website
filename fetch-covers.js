@@ -4,6 +4,7 @@ import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import sharp from 'sharp';
+import { slugify } from './lib/slug.js';
 
 // Covers render in a ~330px grid cell (≤660px @2x), so cap the long edge at 660px.
 const MAX_EDGE = 660;
@@ -14,12 +15,6 @@ const MUSIC_JSON = join(__dirname, 'src/data/music.json');
 // The `cover` field keeps its historical "/images/<file>" form as a logical
 // key; resolveCover() in src/lib/covers.ts matches on the bare filename.
 const IMAGES_DIR = join(__dirname, 'src/assets/covers');
-
-function slugify(str) {
-  return str.toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '');
-}
 
 // Odesli platform key -> our stable service key, in display order. Only these
 // are persisted; anything else Odesli lists is dropped.

@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import sharp from 'sharp';
+import { slugify } from './lib/slug.js';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const MUSIC_JSON = path.join(__dir, 'src/data/music.json');
@@ -23,10 +24,6 @@ function readBody(req) {
     req.on('data', chunk => body += chunk);
     req.on('end', () => resolve(JSON.parse(body)));
   });
-}
-
-function slugify(str) {
-  return String(str).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 }
 
 // Resize an uploaded cover and write it to src/assets/covers/ under the same

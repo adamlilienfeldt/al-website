@@ -273,5 +273,16 @@
     "cover": "/images/zola-mennenoh-longing-for-belonging.jpg",
     "credits": "engineer",
     "label": "figure 8 records"
+  },
+  {
+    "order": 7,
+    "artist": "ELBA",
+    "title": "nu skal hele verden dreje sig om mig",
+    "type": "single",
+    "year": "2026",
+    "link": "https://open.spotify.com/track/1EToAwQ2ecOX3CSan1mumw?si=1963537df8214595",
+    "cover": "/images/elba-nu-skal-hele-verden-dreje-sig-om-mig.jpg",
+    "credits": "producer, mixer, various instruments",
+    "label": "Nordic Music Society"
   }
 ]

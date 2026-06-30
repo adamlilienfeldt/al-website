@@ -99,9 +99,9 @@ run `npm run fetch-covers` first when adding a release. CI deploys on push.
 
 - **Apple Music / YouTube are often missing** for smaller releases — that's
   Odesli's data gap, not a bug. The picker just shows whatever exists.
-- **`admin.js` (`npm run admin`) is currently out of sync** with this pipeline:
-  it saves covers to `public/images/` (which the build no longer reads) and
-  doesn't set `services` or run the fetch. Use it only for reordering /
-  editing text fields — not for adding covers. Prefer the JSON + fetch flow
-  above. (Fixing admin to write to `src/assets/covers/` and trigger the fetch
-  is a possible future cleanup.)
+- **`admin.js` (`npm run admin`)** is a local web UI (port 3001) for
+  adding / editing / reordering entries without touching JSON by hand. It now
+  writes uploaded covers to `src/assets/covers/` (resized, same slug as
+  `fetch-covers.js`), so its covers feed the build correctly. It does **not**
+  set `services` — after adding a release in admin, still run
+  `npm run fetch-covers` to pull the streaming links.

@@ -2,11 +2,17 @@ import http from 'http';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import sharp from 'sharp';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const MUSIC_JSON = path.join(__dir, 'src/data/music.json');
 const FILM_JSON  = path.join(__dir, 'src/data/film.json');
 const PUBLIC     = path.join(__dir, 'public');
+// Covers live in src/assets so astro:assets optimizes them at build time. The
+// `cover` field keeps its logical "/images/<file>" form; covers.ts matches on
+// the bare filename. Mirrors fetch-covers.js.
+const COVERS_DIR = path.join(__dir, 'src/assets/covers');
+const MAX_EDGE   = 660;
 const PORT       = 3001;
 
 const MIME = { '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp' };
@@ -19,11 +25,23 @@ function readBody(req) {
   });
 }
 
-function saveImage(cover) {
+function slugify(str) {
+  return String(str).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+}
+
+// Resize an uploaded cover and write it to src/assets/covers/ under the same
+// <artist-title>.jpg slug fetch-covers.js uses, so the two paths agree. Returns
+// the logical "/images/<file>" value for the `cover` field, or '' if no upload.
+async function saveImage(cover, artist, title) {
   if (!cover?.data) return '';
   const base64 = cover.data.replace(/^data:image\/\w+;base64,/, '');
-  const filename = cover.name.replace(/\s+/g, '-').toLowerCase();
-  fs.writeFileSync(path.join(PUBLIC, 'images', filename), Buffer.from(base64, 'base64'));
+  const input = Buffer.from(base64, 'base64');
+  const filename = `${slugify(`${artist}-${title}`)}.jpg`;
+  const output = await sharp(input)
+    .resize({ width: MAX_EDGE, height: MAX_EDGE, fit: 'inside', withoutEnlargement: true })
+    .jpeg({ quality: 82, mozjpeg: true })
+    .toBuffer();
+  fs.writeFileSync(path.join(COVERS_DIR, filename), output);
   return `/images/${filename}`;
 }
 
@@ -490,9 +508,13 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (req.method === 'GET' && req.url.startsWith('/images/')) {
-    const filePath = path.join(PUBLIC, req.url);
-    const ext = path.extname(filePath);
-    if (fs.existsSync(filePath) && MIME[ext]) { res.writeHead(200, {'Content-Type':MIME[ext]}); fs.createReadStream(filePath).pipe(res); return; }
+    const name = path.basename(req.url);
+    const ext = path.extname(name);
+    // Covers now live in src/assets/covers; fall back to public/images for any
+    // legacy files still referenced.
+    const candidates = [path.join(COVERS_DIR, name), path.join(PUBLIC, 'images', name)];
+    const filePath = candidates.find(p => fs.existsSync(p));
+    if (filePath && MIME[ext]) { res.writeHead(200, {'Content-Type':MIME[ext]}); fs.createReadStream(filePath).pipe(res); return; }
   }
 
   if (req.method === 'POST' && req.url === '/save-music') {
@@ -523,7 +545,7 @@ const server = http.createServer(async (req, res) => {
       const releases = JSON.parse(fs.readFileSync(MUSIC_JSON, 'utf8'));
       const maxOrder = Math.max(0, ...releases.map(r => r.order ?? 0));
       releases.push({ order: maxOrder + 1, artist: body.artist, title: body.title, type: body.type || 'single',
-        year: body.year || '', link: body.link || '', cover: saveImage(body.cover), credits: body.credits || '', label: body.label || '' });
+        year: body.year || '', link: body.link || '', cover: await saveImage(body.cover, body.artist, body.title), credits: body.credits || '', label: body.label || '' });
       fs.writeFileSync(MUSIC_JSON, JSON.stringify(releases, null, 2) + '\n');
       json(200, { ok: true });
     } catch (e) { json(500, { error: e.message }); }
@@ -536,7 +558,7 @@ const server = http.createServer(async (req, res) => {
       const films = JSON.parse(fs.readFileSync(FILM_JSON, 'utf8'));
       const maxOrder = Math.max(0, ...films.map(f => f.order ?? 0));
       films.push({ order: maxOrder + 1, title: body.title, role: body.role || '', year: body.year || '',
-        link: body.link || '', cover: saveImage(body.cover), vimeo_id: body.vimeo_id || '' });
+        link: body.link || '', cover: await saveImage(body.cover, body.title, ''), vimeo_id: body.vimeo_id || '' });
       fs.writeFileSync(FILM_JSON, JSON.stringify(films, null, 2) + '\n');
       json(200, { ok: true });
     } catch (e) { json(500, { error: e.message }); }
@@ -550,7 +572,7 @@ const server = http.createServer(async (req, res) => {
       const [origArtist, origTitle] = body.originalId.split('||');
       const r = releases.find(r => r.artist === origArtist && r.title === origTitle);
       if (!r) { json(404, { error: 'not found' }); return; }
-      const coverPath = body.cover ? saveImage(body.cover) : (r.cover || '');
+      const coverPath = body.cover ? await saveImage(body.cover, body.artist, body.title) : (r.cover || '');
       Object.assign(r, { artist: body.artist, title: body.title, type: body.type, year: body.year,
         link: body.link, cover: coverPath, credits: body.credits, label: body.label });
       fs.writeFileSync(MUSIC_JSON, JSON.stringify(releases, null, 2) + '\n');
@@ -576,7 +598,7 @@ const server = http.createServer(async (req, res) => {
       const films = JSON.parse(fs.readFileSync(FILM_JSON, 'utf8'));
       const f = films.find(f => f.title === body.originalId);
       if (!f) { json(404, { error: 'not found' }); return; }
-      const coverPath = body.cover ? saveImage(body.cover) : (f.cover || '');
+      const coverPath = body.cover ? await saveImage(body.cover, body.title, '') : (f.cover || '');
       Object.assign(f, { title: body.title, role: body.role, year: body.year, link: body.link, vimeo_id: body.vimeo_id, cover: coverPath });
       fs.writeFileSync(FILM_JSON, JSON.stringify(films, null, 2) + '\n');
       json(200, { ok: true });

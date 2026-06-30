@@ -22,7 +22,7 @@ function slugify(str) {
 }
 
 // Odesli platform key -> our stable service key, in display order. Only these
-// are persisted; anything else Odesli returns is dropped.
+// are persisted; anything else Odesli lists is dropped.
 const PLATFORMS = [
   ['spotify', 'spotify'],
   ['appleMusic', 'appleMusic'],
@@ -33,29 +33,68 @@ const PLATFORMS = [
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-// One Odesli lookup returns both the cover thumbnail and the per-service links.
-// Odesli's free tier is ~10 req/min, so retry on 429 with backoff.
-async function fetchOdesli(link) {
-  const url = `https://api.song.link/v1-alpha.1/links?url=${encodeURIComponent(link)}`;
-  let res;
-  for (let attempt = 0; attempt < 4; attempt++) {
-    res = await fetch(url);
-    if (res.status !== 429) break;
-    const wait = 2000 * (attempt + 1);
-    console.log(`    rate-limited, retrying in ${wait / 1000}s`);
-    await sleep(wait);
+// Recursively find the first object key in a parsed JSON tree.
+function deepFind(obj, key) {
+  if (Array.isArray(obj)) {
+    for (const v of obj) {
+      const r = deepFind(v, key);
+      if (r !== undefined) return r;
+    }
+  } else if (obj && typeof obj === 'object') {
+    if (key in obj) return obj[key];
+    for (const v of Object.values(obj)) {
+      const r = deepFind(v, key);
+      if (r !== undefined) return r;
+    }
   }
-  if (!res.ok) throw new Error(`Odesli API error ${res.status} for ${link}`);
-  const data = await res.json();
-  const entity = Object.values(data.entitiesByUniqueId)[0];
+  return undefined;
+}
+
+// Scrape the public song.link / album.link page rather than the API. The page
+// embeds the full link set (incl. YouTube/Apple) in __NEXT_DATA__ and isn't
+// subject to the API's aggressive 429 throttle — it also resolves Odesli's own
+// shortlinks, which the API rejects with 400.
+async function fetchOdesli(link) {
+  // Odesli's own short pages (song.link/album.link) embed __NEXT_DATA__
+  // directly. A raw Spotify track/album URL is mapped to the equivalent
+  // song.link /s/ (or album.link) page, which carries the same data.
+  // (song.link/?url= just bounces to the odesli.co homepage — no page data.)
+  let pageUrl = link;
+  const sp = link.match(/open\.spotify\.com\/(track|album)\/([A-Za-z0-9]+)/);
+  if (sp) {
+    pageUrl = sp[1] === 'album'
+      ? `https://album.link/s/${sp[2]}`
+      : `https://song.link/s/${sp[2]}`;
+  }
+
+  const res = await fetch(pageUrl, {
+    headers: { 'User-Agent': 'Mozilla/5.0' },
+    redirect: 'follow',
+  });
+  if (!res.ok) throw new Error(`page fetch ${res.status} for ${link}`);
+  const html = await res.text();
+
+  const m = html.match(/id="__NEXT_DATA__"[^>]*>(.*?)<\/script>/s);
+  if (!m) throw new Error(`no __NEXT_DATA__ in page for ${link}`);
+  const data = JSON.parse(m[1]);
+
+  const pageData = deepFind(data, 'pageData');
+  const sections = pageData?.sections || [];
+  const listen = sections.find((s) => s?.displayName === 'Listen');
+  const byPlatform = {};
+  for (const ln of listen?.links || []) {
+    if (ln?.platform && ln?.url) byPlatform[ln.platform] = ln.url;
+  }
 
   const services = {};
   for (const [odesliKey, ourKey] of PLATFORMS) {
-    const url = data.linksByPlatform?.[odesliKey]?.url;
-    if (url) services[ourKey] = url;
+    if (byPlatform[odesliKey]) services[ourKey] = byPlatform[odesliKey];
   }
 
-  return { thumbnailUrl: entity?.thumbnailUrl, services };
+  // Thumbnail lives on the first (header) section.
+  const thumbnailUrl = sections.find((s) => s?.thumbnailUrl)?.thumbnailUrl;
+
+  return { thumbnailUrl, services };
 }
 
 async function downloadImage(imageUrl, destPath) {
@@ -73,8 +112,8 @@ async function main() {
   // --force re-fetches service links even when already present (covers are
   // still skipped if on disk). Used to enrich thin/partial service data.
   const force = process.argv.includes('--force');
-  // Odesli free tier rate-limits aggressively; default 7s, --force uses 12s.
-  const throttleMs = force ? 12000 : 7000;
+  // Page scrape isn't API-throttled; a small polite delay is plenty.
+  const throttleMs = 800;
 
   const releases = JSON.parse(readFileSync(MUSIC_JSON, 'utf-8'));
   let changed = false;

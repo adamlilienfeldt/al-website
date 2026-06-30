@@ -8,7 +8,11 @@
     "link": "https://album.link/xhwj3gf0kccsw",
     "cover": "/images/kindsight-swedish-punk.jpg",
     "credits": "producer, engineer, mixer, add. instruments",
-    "label": "Rama Lama Records"
+    "label": "Rama Lama Records",
+    "services": {
+      "spotify": "https://open.spotify.com/album/41auDAYLwqCF7zAxghkeaA",
+      "tidal": "https://listen.tidal.com/album/202657642"
+    }
   },
   {
     "order": 11,
@@ -34,7 +38,11 @@
     "link": "https://album.link/hkxnxzcrrffxp",
     "cover": "/images/slorede-linier-hele-verden-altid.jpg",
     "credits": "producer, mixer, various instruments",
-    "label": "Kös"
+    "label": "Kös",
+    "services": {
+      "spotify": "https://open.spotify.com/album/67x40CyMHf9IlvXmOHbvM5",
+      "tidal": "https://listen.tidal.com/album/363362771"
+    }
   },
   {
     "order": 9,
@@ -45,7 +53,10 @@
     "link": "https://album.link/b8j294stcmvfj",
     "cover": "/images/slorede-linier-uendeligt.jpg",
     "credits": "producer, mixer, various instruments",
-    "label": "Kös"
+    "label": "Kös",
+    "services": {
+      "spotify": "https://open.spotify.com/album/7CSgmaJ2HkklpfPYiRt8sb"
+    }
   },
   {
     "order": 14,
@@ -56,7 +67,11 @@
     "link": "https://song.link/qzts0sp0shkws",
     "cover": "/images/slorede-linier-med-tid-vokser.jpg",
     "credits": "producer, mixer, various instruments",
-    "label": "Kös"
+    "label": "Kös",
+    "services": {
+      "spotify": "https://open.spotify.com/track/6S7AzYMJO8OjAVQS385rTI",
+      "tidal": "https://listen.tidal.com/track/342286462"
+    }
   },
   {
     "order": 7,
@@ -67,7 +82,11 @@
     "link": "https://song.link/76jqsk79fn4pd",
     "cover": "/images/elvira-alfaro-human.jpg",
     "credits": "producer, mixer, various instruments",
-    "label": "Capella Records"
+    "label": "Capella Records",
+    "services": {
+      "spotify": "https://open.spotify.com/track/77RDG46UcExbT1LFjZvU3Q",
+      "tidal": "https://listen.tidal.com/track/396222450"
+    }
   },
   {
     "order": 10,
@@ -78,7 +97,11 @@
     "link": "https://album.link/dxhh492jxw3xz",
     "cover": "/images/elvira-alfaro-in-love-with-a-feeling.jpg",
     "credits": "producer, co-writer, mixer, various instruments",
-    "label": ""
+    "label": "",
+    "services": {
+      "spotify": "https://open.spotify.com/album/6KPLM9ev4MsL66aqvGshdV",
+      "tidal": "https://listen.tidal.com/album/303538063"
+    }
   },
   {
     "order": 18,
@@ -91,7 +114,7 @@
     "credits": "producer, mixer, various instruments",
     "label": "Capella Records",
     "services": {
-      "appleMusic": "https://geo.music.apple.com/dk/album/_/1610322225?i=1610322228&mt=1&app=music&ls=1&at=1000lHKX&ct=api_http&itscg=30200&itsct=odsl_m",
+      "appleMusic": "https://geo.music.apple.com/dk/album/_/1610322225?i=1610322228&mt=1&app=music&ls=1",
       "tidal": "https://listen.tidal.com/track/216939686"
     }
   },
@@ -194,7 +217,11 @@
     "link": "https://song.link/ddxvjhvwrqw9p",
     "cover": "/images/erik-apollo-digter.jpg",
     "credits": "producer, synths, guitars",
-    "label": "Nordic Music Society"
+    "label": "Nordic Music Society",
+    "services": {
+      "spotify": "https://open.spotify.com/track/0GdVALjZssFtblZxX7ARtd",
+      "tidal": "https://listen.tidal.com/track/422322585"
+    }
   },
   {
     "order": 19,
@@ -205,7 +232,11 @@
     "link": "https://song.link/wvx5q6kzdhj4w",
     "cover": "/images/j-fen-hapens-22-skidoo-sundays.jpg",
     "credits": "producer, various instruments",
-    "label": ""
+    "label": "",
+    "services": {
+      "spotify": "https://open.spotify.com/track/5wlzqdWiEUuW1n9hrPl1wm",
+      "tidal": "https://listen.tidal.com/track/140528439"
+    }
   },
   {
     "order": 20,
@@ -216,7 +247,11 @@
     "link": "https://song.link/2b6m8wfvgjkn0",
     "cover": "/images/j-fen-hapens-getting-later-troubled.jpg",
     "credits": "producer, mixer, various instruments",
-    "label": ""
+    "label": "",
+    "services": {
+      "spotify": "https://open.spotify.com/track/2OcB9IgMk5WNBuC7NY0mNJ",
+      "tidal": "https://listen.tidal.com/track/107303953"
+    }
   },
   {
     "order": 2,
@@ -242,7 +277,11 @@
     "link": "https://song.link/s/0wl9pxQkwSxixjDtlRfo0t",
     "cover": "/images/elba-hvad-laver-du-nu.jpg",
     "credits": "producer, mixer, various instruments",
-    "label": "Nordic Music Society"
+    "label": "Nordic Music Society",
+    "services": {
+      "spotify": "https://open.spotify.com/track/0wl9pxQkwSxixjDtlRfo0t",
+      "tidal": "https://listen.tidal.com/track/469077492"
+    }
   },
   {
     "order": 3,
@@ -253,7 +292,11 @@
     "link": "https://album.link/mppmscvsctxd2",
     "cover": "/images/alawari-leviathan.jpg",
     "credits": "mixer",
-    "label": "April Records"
+    "label": "April Records",
+    "services": {
+      "spotify": "https://open.spotify.com/album/3AeY3nIYWuuYHF8HqTcCg4",
+      "tidal": "https://listen.tidal.com/album/382290559"
+    }
   },
   {
     "order": 21,
@@ -264,7 +307,11 @@
     "link": "https://album.link/s/285KIVMOhpOsKnoD7pj5fG",
     "cover": "/images/malte-dueholm-er-bladene-blaest-ned.jpg",
     "credits": "producer, mixer, engineer",
-    "label": ""
+    "label": "",
+    "services": {
+      "spotify": "https://open.spotify.com/album/285KIVMOhpOsKnoD7pj5fG",
+      "tidal": "https://listen.tidal.com/album/118365004"
+    }
   },
   {
     "order": 22,
@@ -275,7 +322,11 @@
     "link": "https://album.link/s/2B2tc6UtdqgwzcGK561F7H",
     "cover": "/images/nooooooo-daylight.jpg",
     "credits": "co-producer, co-mixer, co-enginieeer",
-    "label": "Kjeldfred & Overgaard"
+    "label": "Kjeldfred & Overgaard",
+    "services": {
+      "spotify": "https://open.spotify.com/album/2B2tc6UtdqgwzcGK561F7H",
+      "tidal": "https://listen.tidal.com/album/137898627"
+    }
   },
   {
     "order": 23,
@@ -286,7 +337,11 @@
     "link": "https://album.link/gt2dhcqsgfvmv",
     "cover": "/images/alcabean-confessions.jpg",
     "credits": "keyboards",
-    "label": "W.A.S Entertainment"
+    "label": "W.A.S Entertainment",
+    "services": {
+      "spotify": "https://open.spotify.com/album/2tdY5eQZxIxUqhiw0Wwiyo",
+      "tidal": "https://listen.tidal.com/album/473034176"
+    }
   },
   {
     "order": 24,
@@ -297,7 +352,10 @@
     "link": "https://album.link/s/1SPLGYeTWAMoOXszd3RlWi",
     "cover": "/images/bona-fide-joy-prince-of-scars.jpg",
     "credits": "mixer",
-    "label": "Escho"
+    "label": "Escho",
+    "services": {
+      "spotify": "https://open.spotify.com/album/1SPLGYeTWAMoOXszd3RlWi"
+    }
   },
   {
     "order": 25,
@@ -308,7 +366,11 @@
     "link": "https://album.link/kn3rm0jmb8skr",
     "cover": "/images/zola-mennenoh-longing-for-belonging.jpg",
     "credits": "engineer",
-    "label": "figure 8 records"
+    "label": "figure 8 records",
+    "services": {
+      "spotify": "https://open.spotify.com/album/4WkD0GCZdZzfi6l1oE63Kw",
+      "tidal": "https://listen.tidal.com/album/153134823"
+    }
   },
   {
     "order": 7,
@@ -319,6 +381,10 @@
     "link": "https://open.spotify.com/track/1EToAwQ2ecOX3CSan1mumw?si=1963537df8214595",
     "cover": "/images/elba-nu-skal-hele-verden-dreje-sig-om-mig.jpg",
     "credits": "producer, mixer, various instruments",
-    "label": "Nordic Music Society"
+    "label": "Nordic Music Society",
+    "services": {
+      "spotify": "https://open.spotify.com/track/1EToAwQ2ecOX3CSan1mumw",
+      "tidal": "https://listen.tidal.com/track/526579039"
+    }
   }
 ]

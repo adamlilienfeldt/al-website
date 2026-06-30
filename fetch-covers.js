@@ -85,7 +85,8 @@ function matchApple(results, artist, title) {
 }
 
 async function fetchAppleMusic(artist, title, type) {
-  const entity = type === 'album' ? 'album' : 'song';
+  // EPs and albums are collections on Apple; only true singles are 'song'.
+  const entity = type === 'single' ? 'song' : 'album';
   // Try the full title, then the part before a "/" (split-single titles).
   const titles = [title];
   if (title.includes('/')) titles.push(title.split('/')[0].trim());
@@ -170,7 +171,7 @@ async function main() {
       force || !release.services || Object.keys(release.services).length === 0;
     if (!needsCover && !needsServices) continue;
 
-    const apiUrl = release.spotify || release.link;
+    const apiUrl = release.link;
     if (!apiUrl) continue;
 
     const slug = slugify(`${release.artist}-${release.title}`);
@@ -204,15 +205,18 @@ async function main() {
         }
       }
 
-      // On --force, never overwrite richer existing data with a thinner
-      // (e.g. partial/transient) response.
-      const existingCount = Object.keys(release.services || {}).length;
-      if (Object.keys(services).length > 0 && Object.keys(services).length >= existingCount) {
-        release.services = services;
-        changed = true;
-        console.log(`    services: ${Object.keys(services).join(', ')}`);
-      } else if (Object.keys(services).length) {
-        console.log(`    keeping existing (${existingCount}) over thinner (${Object.keys(services).length})`);
+      // On --force, never drop a platform we already have. Merge the fresh
+      // response over the existing services so re-fetches only ever add/refresh
+      // keys, never lose one to a partial/transient response.
+      if (Object.keys(services).length > 0) {
+        const existing = release.services || {};
+        const merged = { ...existing, ...services };
+        const added = Object.keys(merged).filter((k) => !(k in existing));
+        if (JSON.stringify(merged) !== JSON.stringify(existing)) {
+          release.services = merged;
+          changed = true;
+          console.log(`    services: ${Object.keys(merged).join(', ')}${added.length ? ` (+${added.join(', ')})` : ''}`);
+        }
       }
 
       // Apple Music fallback: Odesli misses it for many small releases, but the
@@ -229,7 +233,7 @@ async function main() {
       console.error(`    error: ${err.message}`);
     }
 
-    // Stay under Odesli's free-tier rate limit (~10 req/min).
+    // Polite delay between page scrapes / iTunes lookups.
     await sleep(throttleMs);
   }
 

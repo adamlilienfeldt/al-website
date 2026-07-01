@@ -5,6 +5,8 @@ release is one object in that array. Covers and streaming-service links are
 filled in automatically by [`fetch-covers.js`](fetch-covers.js) — you only
 hand-write the basic fields.
 
+
+
 ## TL;DR
 
 1. Add an entry to `src/data/music.json` (minimum: `artist`, `title`, `link`, `order`).
@@ -12,6 +14,10 @@ hand-write the basic fields.
 3. `npm run build` to check it locally, then commit + push.
 
 That's it. CI builds and deploys on push.
+
+> Prefer a UI? There's a local admin tool — `npm run admin` (port 3001) —
+> for adding / editing / reordering without touching JSON by hand. See
+> [Notes](#notes) for the caveat. The JSON flow above is still the source of truth.
 
 ## 1. Add the entry
 

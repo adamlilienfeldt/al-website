@@ -203,14 +203,7 @@ main {
   overflow: hidden;
   cursor: default;
   background: var(--placeholder);
-  transition: transform 0.2s ease;
   container-type: inline-size;
-}
-
-@media (hover: hover) {
-  .card:hover {
-    transform: scale(var(--card-hover-scale));
-  }
 }
 
 .card.has-link {
@@ -459,7 +452,7 @@ footer {
 .odesli-modal-content {
   background: #fff;
   border-radius: 8px;
-  padding: 20px 24px;
+  padding: 32px 40px;
   width: auto;
   max-width: 90vw;
   position: relative;
@@ -483,22 +476,22 @@ footer {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
+  gap: 20px;
 }
 
 .odesli-modal-cover {
-  width: 120px;
-  height: 120px;
+  width: 200px;
+  height: 200px;
   object-fit: cover;
   border-radius: 4px;
 }
 
 .odesli-modal-title {
-  font-size: 14px;
+  font-size: 17px;
   font-weight: 100;
   color: #111;
   text-align: center;
-  max-width: 240px;
+  max-width: 320px;
 }
 
 /* Row of service icons (modal) */
@@ -507,7 +500,7 @@ footer {
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: 18px;
+  gap: 24px;
   padding: 4px;
 }
 
@@ -521,8 +514,8 @@ footer {
 }
 
 .odesli-service.has-icon {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
 }
 
 .odesli-service svg {

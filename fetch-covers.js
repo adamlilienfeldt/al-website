@@ -8,9 +8,12 @@ import { slugify } from './lib/slug.js';
 
 // Covers render in a ~330px grid cell (≤660px @2x), so cap the long edge at 660px.
 const MAX_EDGE = 660;
+// Film posters render up to half the page width, so they get a bigger cap.
+const FILM_MAX_EDGE = 1280;
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const MUSIC_JSON = join(__dirname, 'src/data/music.json');
+const FILM_JSON = join(__dirname, 'src/data/film.json');
 // Covers live in src/assets so astro:assets can optimize them at build time.
 // The `cover` field keeps its historical "/images/<file>" form as a logical
 // key; resolveCover() in src/lib/covers.ts matches on the bare filename.
@@ -139,15 +142,59 @@ async function fetchOdesli(link) {
   return { thumbnailUrl, services };
 }
 
-async function downloadImage(imageUrl, destPath) {
+async function downloadImage(imageUrl, destPath, maxEdge = MAX_EDGE) {
   const res = await fetch(imageUrl);
   if (!res.ok) throw new Error(`Failed to download ${imageUrl}`);
   const input = Buffer.from(await res.arrayBuffer());
   const output = await sharp(input)
-    .resize({ width: MAX_EDGE, height: MAX_EDGE, fit: 'inside', withoutEnlargement: true })
+    .resize({ width: maxEdge, height: maxEdge, fit: 'inside', withoutEnlargement: true })
     .jpeg({ quality: 82, mozjpeg: true })
     .toBuffer();
   writeFileSync(destPath, output);
+}
+
+// Video film cards don't load the Vimeo iframe until the visitor clicks play,
+// so the poster is what they see until then — a video entry without a cover
+// renders as a black card. Pull Vimeo's own thumbnail for any that lack one.
+async function fetchFilmPosters() {
+  const films = JSON.parse(readFileSync(FILM_JSON, 'utf-8'));
+  let changed = false;
+
+  for (const film of films) {
+    if (!film.vimeo_id || film.cover) continue;
+
+    const filename = `${slugify(film.title)}.jpg`;
+    const localPath = `/images/${filename}`;
+    const destPath = join(IMAGES_DIR, filename);
+    console.log(`film: ${film.title}`);
+
+    if (existsSync(destPath)) {
+      console.log(`    exists: ${filename}, setting cover`);
+      film.cover = localPath;
+      changed = true;
+      continue;
+    }
+
+    try {
+      const api = `https://vimeo.com/api/oembed.json?url=https://vimeo.com/${film.vimeo_id}&width=1280`;
+      const res = await fetch(api);
+      if (!res.ok) throw new Error(`oembed ${res.status}`);
+      const { thumbnail_url: thumb } = await res.json();
+      if (!thumb) throw new Error('no thumbnail_url');
+
+      await downloadImage(thumb, destPath, FILM_MAX_EDGE);
+      film.cover = localPath;
+      changed = true;
+      console.log(`    saved: ${filename}`);
+    } catch (err) {
+      console.error(`    error: ${err.message}`);
+    }
+  }
+
+  if (changed) {
+    writeFileSync(FILM_JSON, JSON.stringify(films, null, 2) + '\n');
+    console.log('updated film.json');
+  }
 }
 
 async function main() {
@@ -238,6 +285,8 @@ async function main() {
   } else {
     console.log('nothing to fetch');
   }
+
+  await fetchFilmPosters();
 }
 
 main();

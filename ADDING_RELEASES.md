@@ -101,6 +101,23 @@ git push
 `npm run build` does **not** fetch anything (it's just `astro build`) — so always
 run `npm run fetch-covers` first when adding a release. CI deploys on push.
 
+## Adding a film with a Vimeo video
+
+Film entries live in [`src/data/film.json`](src/data/film.json). A video entry
+needs a `vimeo_id` **and** a `cover`: the player iframe is only loaded when a
+visitor clicks play, so the `cover` image is what they see until then. Without
+one the card renders black (still playable, just no thumbnail).
+
+You don't have to make the poster yourself:
+
+1. Add the entry with `title`, `vimeo_id` and `order` — leave `cover` out.
+2. Run `npm run fetch-covers`. It pulls Vimeo's own thumbnail for any video
+   entry missing a cover, writes it to `src/assets/covers/<slug>.jpg`, and
+   fills in the `cover` field.
+
+Same command as the music flow, and it's safe to re-run — entries that already
+have a cover are skipped.
+
 ## Notes
 
 - **Apple Music / YouTube are often missing** for smaller releases — that's

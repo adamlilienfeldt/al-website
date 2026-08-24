@@ -7,7 +7,7 @@
     "film_company": "Final Cut for Real",
     "year": "",
     "link": "https://vimeo.com/302691761",
-    "cover": "",
+    "cover": "/images/a-word-for-human.jpg",
     "vimeo_id": "302691761"
   },
   {
@@ -29,7 +29,7 @@
     "film_company": "Copenhagen Film Company",
     "year": "",
     "link": "https://vimeo.com/257884192",
-    "cover": "",
+    "cover": "/images/trommeslager.jpg",
     "vimeo_id": "257884192"
   }
 ]

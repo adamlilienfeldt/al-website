@@ -367,6 +367,63 @@ main {
   border: 0;
 }
 
+/* Poster + play button stand in for the Vimeo player until first click,
+   so no third-party iframe loads on page view. */
+.film-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.film-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--overlay-bg);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.film-play svg {
+  width: 28px;
+  height: 28px;
+  margin-left: 3px; /* optical centering of the triangle */
+}
+
+.film-play:hover {
+  transform: translate(-50%, -50%) scale(1.08);
+}
+
+.film-card--video.revealed .film-poster,
+.film-card--video.revealed .film-play {
+  display: none;
+}
+
+/* Info overlay wins while it is showing. */
+.film-card--video.active .film-play {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (hover: hover) {
+  .film-card--video:not(.revealed):hover .film-play {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
 .film-video-cover {
   position: absolute;
   inset: 0;
@@ -549,43 +606,6 @@ footer {
 .odesli-service:hover {
   color: #555;
   transform: scale(1.12);
-}
-
-/* ─── Service overlay (icons over the cover, on click) ─── */
-.card-services {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  padding: 16px;
-  background: var(--overlay-bg, rgba(0, 0, 0, 0.72));
-  animation: card-services-in 0.15s ease;
-}
-
-@keyframes card-services-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-/* Icons sit on the dark scrim → light, brand-neutral */
-.card-services .odesli-service {
-  color: #fff;
-}
-.card-services .odesli-service:hover {
-  color: #ccc;
-}
-.card-services .odesli-service.has-icon {
-  width: clamp(26px, 16cqw, 38px);
-  height: clamp(26px, 16cqw, 38px);
-}
-
-/* Hide the hover info overlay while the picker is open */
-.card.services-open .card-overlay {
-  opacity: 0 !important;
 }
 
 /* Text fallback link keeps a button look. */

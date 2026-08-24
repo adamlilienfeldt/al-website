@@ -22,8 +22,22 @@ const coverSrc = cover;
 {isVideo ? (
   <div class="film-card film-card--video" data-vimeo={vimeo_id}>
     <div class="film-video-wrapper">
+      {cover && (
+        <Picture
+          class="film-poster"
+          src={cover}
+          formats={['avif', 'webp']}
+          widths={[640, 1280]}
+          sizes="(max-width: 900px) 100vw, 50vw"
+          alt={title}
+          loading="lazy"
+        />
+      )}
+      <button class="film-play" type="button" aria-label={`Play ${title}`}>
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+      </button>
       <iframe
-        src={`https://player.vimeo.com/video/${vimeo_id}`}
+        data-src={`https://player.vimeo.com/video/${vimeo_id}?autoplay=1`}
         allow="autoplay; fullscreen; picture-in-picture"
         allowfullscreen
         title={title}
@@ -68,6 +82,9 @@ const coverSrc = cover;
 {isVideo && (
   <script>
     function revealVideo(card: HTMLElement) {
+      const iframe = card.querySelector('iframe')!;
+      // First reveal loads the player; later reveals must not restart it.
+      if (!iframe.src && iframe.dataset.src) iframe.src = iframe.dataset.src;
       card.classList.remove('active');
       card.classList.add('revealed');
     }
@@ -102,6 +119,8 @@ const coverSrc = cover;
           revealVideo(card);
         });
       }
+
+      card.querySelector('.film-play')?.addEventListener('click', () => revealVideo(card));
     });
 
     // Mobile: dismiss overlay when tapping elsewhere

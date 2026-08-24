@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import { DARK_MODE, FORCE_DARK } from '../config';
+import ogImage from '../assets/_DSC5353-1.jpeg';
 
 interface Props {
   title: string;
@@ -8,6 +9,10 @@ interface Props {
 }
 
 const { title, activePage } = Astro.props;
+
+const description = 'producer, engineer, musician and composer based in copenhagen.';
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImageUrl = new URL(ogImage.src, Astro.site);
 ---
 
 <!doctype html>
@@ -15,8 +20,16 @@ const { title, activePage } = Astro.props;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="adam lilienfeldt — music producer" />
+    <meta name="description" content={description} />
     <title>{title}</title>
+    <link rel="canonical" href={canonical} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
     {!DARK_MODE && <style>:root { color-scheme: light; }</style>}
   </head>
   <body>

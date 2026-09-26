@@ -24,7 +24,8 @@ const coverSrc = cover;
   class:list={['card', { 'has-link': hasLink }]}
   data-link={link || ''}
   data-services={services && Object.keys(services).length ? JSON.stringify(services) : ''}
-  role={hasLink ? 'link' : undefined}
+  role={hasLink ? 'button' : undefined}
+  aria-haspopup={hasLink ? 'dialog' : undefined}
   tabindex={hasLink ? 0 : undefined}
   aria-label={hasLink ? `${title} by ${artist} — open on streaming` : undefined}
 >
@@ -57,10 +58,11 @@ const coverSrc = cover;
   function initCards() {
     const cards = document.querySelectorAll<HTMLElement>('.card');
 
-    // Create modal once
-    let modal = document.getElementById('odesli-modal');
+    // Create modal once. A native <dialog> opened with showModal() traps focus,
+    // closes on Esc, makes the page behind inert, and returns focus on close.
+    let modal = document.getElementById('odesli-modal') as HTMLDialogElement | null;
     if (!modal) {
-      modal = document.createElement('div');
+      modal = document.createElement('dialog');
       modal.id = 'odesli-modal';
       modal.className = 'odesli-modal';
       modal.innerHTML = `
@@ -144,10 +146,11 @@ const coverSrc = cover;
       const thumb = img ? `<img class="odesli-modal-cover" src="${esc(img.currentSrc || img.src)}" alt="">` : '';
       const titleEl = heading ? `<p class="odesli-modal-title">${esc(heading)}</p>` : '';
       servicesEl.innerHTML = thumb + titleEl + `<div class="odesli-services-row">${buildLinks(services, link)}</div>`;
-      modal!.classList.add('open');
+      modal!.setAttribute('aria-label', heading || 'Listen');
+      modal!.showModal();
     }
     function closeModal() {
-      modal!.classList.remove('open');
+      modal!.close();
     }
 
     function openFromCard(card: HTMLElement) {
@@ -157,9 +160,6 @@ const coverSrc = cover;
     closeBtn.addEventListener('click', closeModal);
     modal.addEventListener('click', (e) => {
       if (e.target === modal) closeModal();
-    });
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeModal();
     });
 
     document.addEventListener('click', (e) => {

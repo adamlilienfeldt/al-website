@@ -1,6 +1,6 @@
 [
   {
-    "order": 8,
+    "order": 4,
     "artist": "Kindsight",
     "title": "Swedish Punk",
     "type": "album",
@@ -15,7 +15,7 @@
     }
   },
   {
-    "order": 11,
+    "order": 13,
     "artist": "Kindsight",
     "title": "Love You Baby All the Time",
     "type": "single",
@@ -31,7 +31,7 @@
     }
   },
   {
-    "order": 6,
+    "order": 11,
     "artist": "Slørede Linier",
     "title": "Hele Verden, Altid",
     "type": "album",
@@ -47,7 +47,7 @@
     }
   },
   {
-    "order": 9,
+    "order": 12,
     "artist": "Slørede Linier",
     "title": "Uendeligt",
     "type": "single",
@@ -62,7 +62,7 @@
     }
   },
   {
-    "order": 14,
+    "order": 16,
     "artist": "Slørede Linier",
     "title": "Med Tid Vokser Det Fra Os / Venner Lever Tusind År",
     "type": "single",
@@ -78,7 +78,7 @@
     }
   },
   {
-    "order": 7,
+    "order": 5,
     "artist": "Elvira Alfaro",
     "title": "Human",
     "type": "single",
@@ -94,7 +94,7 @@
     }
   },
   {
-    "order": 10,
+    "order": 8,
     "artist": "Elvira Alfaro",
     "title": "in love with a feeling",
     "type": "EP",
@@ -110,7 +110,7 @@
     }
   },
   {
-    "order": 18,
+    "order": 20,
     "artist": "Elvira Alfaro",
     "title": "space",
     "type": "single",
@@ -125,7 +125,7 @@
     }
   },
   {
-    "order": 16,
+    "order": 18,
     "artist": "Elvira Alfaro",
     "title": "Indigo",
     "type": "single",
@@ -141,7 +141,7 @@
     }
   },
   {
-    "order": 15,
+    "order": 17,
     "artist": "Vera Decay",
     "title": "Cinders",
     "type": "single",
@@ -157,7 +157,7 @@
     }
   },
   {
-    "order": 17,
+    "order": 19,
     "artist": "Fraads",
     "title": "FRaaaDS",
     "type": "album",
@@ -172,7 +172,7 @@
     }
   },
   {
-    "order": 12,
+    "order": 14,
     "artist": "Fraads",
     "title": "Hard drive schlappers (tracks 4+5)",
     "type": "album",
@@ -203,7 +203,7 @@
     }
   },
   {
-    "order": 4,
+    "order": 6,
     "artist": "Sara Lina",
     "title": "Brava",
     "type": "single",
@@ -219,7 +219,7 @@
     }
   },
   {
-    "order": 13,
+    "order": 15,
     "artist": "Erik Apollo",
     "title": "Digter",
     "type": "single",
@@ -235,7 +235,7 @@
     }
   },
   {
-    "order": 19,
+    "order": 21,
     "artist": "J. Fen Hapens",
     "title": "22 Skidoo / Sundays",
     "type": "single",
@@ -251,7 +251,7 @@
     }
   },
   {
-    "order": 20,
+    "order": 22,
     "artist": "J. Fen Hapens",
     "title": "Getting Later / Troubled",
     "type": "single",
@@ -282,8 +282,9 @@
     }
   },
   {
-    "order": 5,
+    "order": 10,
     "artist": "ELBA",
+    "hidden": true,
     "title": "Hvad laver du nu?",
     "type": "single",
     "year": "",
@@ -313,7 +314,7 @@
     }
   },
   {
-    "order": 21,
+    "order": 23,
     "artist": "Malte Dueholm",
     "title": "er bladene blæst ned",
     "type": "album",
@@ -329,7 +330,7 @@
     }
   },
   {
-    "order": 22,
+    "order": 24,
     "artist": "Nooooooo & Thurston Moore",
     "title": "Daylight",
     "type": "album",
@@ -345,7 +346,7 @@
     }
   },
   {
-    "order": 23,
+    "order": 25,
     "artist": "Alcabean",
     "title": "Confessions",
     "type": "album",
@@ -361,7 +362,7 @@
     }
   },
   {
-    "order": 24,
+    "order": 26,
     "artist": "Bona Fide",
     "title": "Prince Of Scars / Joy",
     "type": "single",
@@ -376,7 +377,7 @@
     }
   },
   {
-    "order": 25,
+    "order": 27,
     "artist": "Zola Mennenöh",
     "title": "Longing For Belonging",
     "type": "album",
@@ -392,7 +393,7 @@
     }
   },
   {
-    "order": 7,
+    "order": 9,
     "artist": "ELBA",
     "title": "nu skal hele verden dreje sig om mig",
     "type": "single",
@@ -404,6 +405,21 @@
     "services": {
       "spotify": "https://open.spotify.com/track/1EToAwQ2ecOX3CSan1mumw",
       "tidal": "https://listen.tidal.com/track/526579039"
+    }
+  },
+  {
+    "order": 7,
+    "artist": "ELBA",
+    "title": "tjære og glimmer",
+    "type": "album",
+    "year": "2026",
+    "link": "https://open.spotify.com/album/2QUJPf0O26XoLd1u75GNpc?si=1cFJxQCFRD2vj3_yPVQRQA",
+    "cover": "/images/elba-tj-re-og-glimmer.jpg",
+    "credits": "producer, mixer, various instruments, co-writer (tracks 1-2, 4-10)",
+    "label": "Nordic Music Society",
+    "services": {
+      "spotify": "https://open.spotify.com/album/2QUJPf0O26XoLd1u75GNpc",
+      "tidal": "https://listen.tidal.com/album/552433931"
     }
   }
 ]

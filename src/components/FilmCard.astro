@@ -28,7 +28,7 @@ const coverSrc = cover;
           src={cover}
           formats={['avif', 'webp']}
           widths={[640, 1280]}
-          sizes="(max-width: 900px) 100vw, 50vw"
+          sizes="(max-width: 900px) 100vw, 66vw"
           alt={title}
           loading="lazy"
         />
@@ -43,6 +43,7 @@ const coverSrc = cover;
         title={title}
       />
       <div class="film-video-cover">
+        <svg class="film-overlay-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
         <p class="film-overlay-title">{title}</p>
         {role && <p class="film-overlay-meta">{role}</p>}
         {director && <p class="film-overlay-meta">dir. {director}</p>}
@@ -54,16 +55,16 @@ const coverSrc = cover;
   <div
     class:list={['film-card film-card--poster card', { 'has-link': hasLink }]}
     data-link={link || ''}
-    role={hasLink ? 'link' : undefined}
-    tabindex={hasLink ? 0 : undefined}
-    aria-label={hasLink ? `${title} — open link` : undefined}
+    role={hasLink ? 'link' : 'group'}
+    tabindex={0}
+    aria-label={hasLink ? `${title} — open link` : title}
   >
     {coverSrc
       ? <Picture
           src={coverSrc}
           formats={['avif', 'webp']}
-          widths={[300, 600]}
-          sizes="(max-width: 900px) 100vw, 50vw"
+          widths={[330, 660, 1000]}
+          sizes="(max-width: 900px) min(100vw, 47vh), 33vw"
           alt={title}
           loading="lazy"
         />

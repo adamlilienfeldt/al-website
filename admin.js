@@ -14,6 +14,9 @@ const PUBLIC     = path.join(__dir, 'public');
 // the bare filename. Mirrors fetch-covers.js.
 const COVERS_DIR = path.join(__dir, 'src/assets/covers');
 const MAX_EDGE   = 660;
+// Film posters render up to a third of the page width, so keep more pixels.
+// Mirrors FILM_MAX_EDGE in fetch-covers.js.
+const FILM_MAX_EDGE = 1280;
 const PORT       = 3001;
 
 const MIME = { '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp' };
@@ -29,13 +32,13 @@ function readBody(req) {
 // Resize an uploaded cover and write it to src/assets/covers/ under the same
 // <artist-title>.jpg slug fetch-covers.js uses, so the two paths agree. Returns
 // the logical "/images/<file>" value for the `cover` field, or '' if no upload.
-async function saveImage(cover, artist, title) {
+async function saveImage(cover, artist, title, maxEdge = MAX_EDGE) {
   if (!cover?.data) return '';
   const base64 = cover.data.replace(/^data:image\/\w+;base64,/, '');
   const input = Buffer.from(base64, 'base64');
   const filename = `${slugify(`${artist}-${title}`)}.jpg`;
   const output = await sharp(input)
-    .resize({ width: MAX_EDGE, height: MAX_EDGE, fit: 'inside', withoutEnlargement: true })
+    .resize({ width: maxEdge, height: maxEdge, fit: 'inside', withoutEnlargement: true })
     .jpeg({ quality: 82, mozjpeg: true })
     .toBuffer();
   fs.writeFileSync(path.join(COVERS_DIR, filename), output);
@@ -563,7 +566,7 @@ const server = http.createServer(async (req, res) => {
       const films = JSON.parse(fs.readFileSync(FILM_JSON, 'utf8'));
       const maxOrder = Math.max(0, ...films.map(f => f.order ?? 0));
       films.push({ order: maxOrder + 1, title: body.title, role: body.role || '', year: body.year || '',
-        link: body.link || '', cover: await saveImage(body.cover, body.title, ''), vimeo_id: body.vimeo_id || '' });
+        link: body.link || '', cover: await saveImage(body.cover, body.title, '', FILM_MAX_EDGE), vimeo_id: body.vimeo_id || '' });
       fs.writeFileSync(FILM_JSON, JSON.stringify(films, null, 2) + '\n');
       json(200, { ok: true });
     } catch (e) { json(500, { error: e.message }); }
@@ -604,7 +607,7 @@ const server = http.createServer(async (req, res) => {
       const films = JSON.parse(fs.readFileSync(FILM_JSON, 'utf8'));
       const f = films.find(f => f.title === body.originalId);
       if (!f) { json(404, { error: 'not found' }); return; }
-      const coverPath = body.cover ? await saveImage(body.cover, body.title, '') : (f.cover || '');
+      const coverPath = body.cover ? await saveImage(body.cover, body.title, '', FILM_MAX_EDGE) : (f.cover || '');
       Object.assign(f, { title: body.title, role: body.role, year: body.year, link: body.link, vimeo_id: body.vimeo_id, cover: coverPath });
       if (body.hidden) f.hidden = true; else delete f.hidden;
       fs.writeFileSync(FILM_JSON, JSON.stringify(films, null, 2) + '\n');

@@ -12,7 +12,9 @@
   --placeholder: #e0e0e0;
   --rule: #f0f0f0;
   --overlay-bg: rgba(0, 0, 0, 0.72);
-  --font: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  /* Inter only kicks in (and only downloads) where Helvetica Neue is missing.
+     It must come before Helvetica, which Windows silently maps to Arial. */
+  --font: "Helvetica Neue", "Inter Variable", Helvetica, Arial, sans-serif;
   --page-pad: 40px;
   --card-hover-scale: 0.99; /* set to 1 to disable */
   --placeholder-pattern: repeating-linear-gradient(
@@ -108,7 +110,7 @@ nav {
   display: flex;
   gap: 28px;
   list-style: none;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 100;
   color: var(--text-secondary);
 }
@@ -122,8 +124,14 @@ nav {
 }
 
 .nav-links a:hover,
-.nav-links a.active {
+.nav-links a[aria-current="page"] {
   color: var(--text);
+}
+
+.nav-links a[aria-current="page"] {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 5px;
 }
 
 /* ─── Main ────────────────────────────────────────────── */
@@ -220,6 +228,7 @@ main {
   .grid { grid-template-columns: repeat(2, 1fr); }
   nav { padding: 28px 16px 14px; }
   .hero { padding: 4px 16px 24px; }
+  .hero p { font-size: 16px; }
 }
 
 /* ─── Card ────────────────────────────────────────────── */
@@ -288,12 +297,12 @@ main {
 }
 
 /* Keyboard focus: reveal the overlay and show a ring inset from the edge. */
-.card.has-link:focus-visible {
+.card:focus-visible {
   outline: 2px solid #ffffff;
   outline-offset: -4px;
 }
 
-.card.has-link:focus-visible .card-overlay {
+.card:focus-visible .card-overlay {
   opacity: 1;
 }
 
@@ -339,7 +348,9 @@ main {
 
 .film-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  /* Videos (16:9) get the wide column, posters (2:3) the narrow one, so the
+     columns come out roughly the same height. */
+  grid-template-columns: 2fr 1fr;
   gap: 40px;
   padding: 0 var(--page-pad);
   align-items: start;
@@ -347,6 +358,8 @@ main {
 
 @media (max-width: 900px) {
   .film-grid { grid-template-columns: 1fr; gap: 40px; }
+  /* Single column: keep a tall poster from filling more than one screen. */
+  .film-card--poster { max-width: calc(70vh * 2 / 3); }
 }
 
 .film-col {
@@ -458,6 +471,25 @@ main {
   pointer-events: none;
   cursor: pointer;
   transition: opacity 0.2s ease;
+}
+
+.film-overlay-play {
+  width: 28px;
+  height: 28px;
+  margin-bottom: 4px;
+}
+
+.film-card--video:not(.revealed):has(.film-play:focus-visible) .film-video-cover {
+  opacity: 1;
+}
+
+.film-card--video:not(.revealed):has(.film-play:focus-visible) .film-play {
+  opacity: 0;
+}
+
+.film-video-wrapper:has(.film-play:focus-visible) {
+  outline: 2px solid var(--text);
+  outline-offset: 3px;
 }
 
 .film-overlay-title {

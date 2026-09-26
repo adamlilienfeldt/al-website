@@ -1,4 +1,5 @@
 ---
+import '@fontsource-variable/inter/wght.css';
 import '../styles/global.css';
 import { DARK_MODE, FORCE_DARK } from '../config';
 import ogImage from '../assets/_DSC5353-1.jpeg';
@@ -36,8 +37,8 @@ const ogImageUrl = new URL(ogImage.src, Astro.site);
     <nav>
       <a href="/" class="nav-heading">adam lilienfeldt</a>
       <ul class="nav-links">
-        <li><a href="/" class:list={[{ active: activePage === 'music' }]}>music</a></li>
-        <li><a href="/film" class:list={[{ active: activePage === 'film' }]}>film</a></li>
+        <li><a href="/" aria-current={activePage === 'music' ? 'page' : undefined}>music</a></li>
+        <li><a href="/film" aria-current={activePage === 'film' ? 'page' : undefined}>film</a></li>
       </ul>
     </nav>
 

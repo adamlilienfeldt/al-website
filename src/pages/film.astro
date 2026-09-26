@@ -4,7 +4,8 @@ import FilmCard from '../components/FilmCard.astro';
 import films from '../data/film.json';
 import { resolveCover } from '../lib/covers';
 
-const sorted = [...films].sort((a, b) => ((a as any).order ?? Infinity) - ((b as any).order ?? Infinity));
+// `"hidden": true` in film.json keeps an entry in the data but off the site.
+const sorted = films.filter((f) => !(f as any).hidden).sort((a, b) => ((a as any).order ?? Infinity) - ((b as any).order ?? Infinity));
 const videos = sorted.filter((f) => f.vimeo_id);
 const posters = sorted.filter((f) => !f.vimeo_id);
 ---

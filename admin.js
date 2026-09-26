@@ -48,7 +48,7 @@ function getHTML(releases, films) {
   const musicItems = releases.map(r => {
     const id = encodeURIComponent(`${r.artist}||${r.title}`);
     const cover = r.cover || '';
-    return `<li class="item" data-id="${id}" data-cover="${esc(cover)}" data-artist="${esc(r.artist)}" data-title="${esc(r.title)}" data-type="${esc(r.type)}" data-year="${esc(r.year)}" data-link="${esc(r.link)}" data-credits="${esc(r.credits)}" data-label="${esc(r.label)}">
+    return `<li class="item${r.hidden ? ' is-hidden' : ''}" data-hidden="${r.hidden ? '1' : ''}" data-id="${id}" data-cover="${esc(cover)}" data-artist="${esc(r.artist)}" data-title="${esc(r.title)}" data-type="${esc(r.type)}" data-year="${esc(r.year)}" data-link="${esc(r.link)}" data-credits="${esc(r.credits)}" data-label="${esc(r.label)}">
       <div class="item-row">
         <span class="handle">⠿</span>
         ${cover ? `<img src="${cover}" alt="">` : '<div class="thumb"></div>'}
@@ -65,7 +65,7 @@ function getHTML(releases, films) {
     const id = encodeURIComponent(f.title);
     const cover = f.cover || '';
     const isVid = !!f.vimeo_id;
-    return `<li class="item" data-id="${id}" data-cover="${esc(cover)}" data-title="${esc(f.title)}" data-role="${esc(f.role)}" data-vimeo="${esc(f.vimeo_id)}" data-year="${esc(f.year)}" data-link="${esc(f.link)}">
+    return `<li class="item${f.hidden ? ' is-hidden' : ''}" data-hidden="${f.hidden ? '1' : ''}" data-id="${id}" data-cover="${esc(cover)}" data-title="${esc(f.title)}" data-role="${esc(f.role)}" data-vimeo="${esc(f.vimeo_id)}" data-year="${esc(f.year)}" data-link="${esc(f.link)}">
       <div class="item-row">
         <span class="handle">⠿</span>
         ${cover ? `<img src="${cover}" alt="">` : `<div class="thumb${isVid ? ' vid' : ''}">${isVid ? '▶' : ''}</div>`}
@@ -116,6 +116,7 @@ function getHTML(releases, films) {
     .info { font-size: 13px; line-height: 1.4; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; flex: 1; }
     .info strong { font-weight: 400; }
     .item-btns { display: flex; gap: 0; flex-shrink: 0; }
+    .item.is-hidden .item-row > img, .item.is-hidden .thumb, .item.is-hidden .info, .preview-card.is-hidden { opacity: 0.3; }
     .edit-btn, .del-btn { background: none; border: none; cursor: pointer; padding: 3px 6px; font-size: 14px; color: #ddd; line-height: 1; }
     .edit-btn:hover { color: #111; }
     .del-btn:hover { color: #c00; }
@@ -128,6 +129,8 @@ function getHTML(releases, films) {
     .ep-cover-row { display: flex; align-items: center; gap: 8px; padding: 4px 0 6px; }
     .ep-thumb { width: 34px; height: 34px; object-fit: cover; }
     .ep-cover-row small { font-size: 11px; color: #aaa; }
+    .ep-hidden-row { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #888; padding: 6px 0; cursor: pointer; }
+    .edit-panel .ep-hidden-row input { width: auto; margin: 0; }
     .ep-actions { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
 
     /* Add section */
@@ -328,6 +331,10 @@ function getHTML(releases, films) {
         addFileRow(panel, 'replace poster');
       }
 
+      const hr = document.createElement('label'); hr.className = 'ep-hidden-row';
+      const hc = document.createElement('input'); hc.type = 'checkbox'; hc.className = 'ep-hidden'; hc.checked = !!d.hidden;
+      hr.append(hc, 'hide from site'); panel.appendChild(hr);
+
       const acts = document.createElement('div'); acts.className = 'ep-actions';
       const sv = document.createElement('button'); sv.className = 'add-btn'; sv.textContent = 'save';
       const ca = document.createElement('button'); ca.className = 'add-btn'; ca.style.background = '#bbb'; ca.textContent = 'cancel';
@@ -364,6 +371,7 @@ function getHTML(releases, films) {
         body = { originalId, title: g('.ep-title'), role: g('.ep-role'), year: g('.ep-year'),
                  link: g('.ep-link'), vimeo_id: g('.ep-vimeo'), cover };
       }
+      body.hidden = panel.querySelector('.ep-hidden').checked;
       const res = await fetch('/edit-' + type, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
       if (res.ok) { status.textContent = 'saved!'; setTimeout(() => location.reload(), 500); }
       else { status.textContent = 'error saving.'; }
@@ -385,7 +393,7 @@ function getHTML(releases, films) {
       document.getElementById('music-preview').innerHTML =
         [...document.querySelectorAll('#music-list .item')].map(el => {
           const cover = el.dataset.cover;
-          return \`<div class="preview-card" data-id="\${el.dataset.id}">
+          return \`<div class="preview-card\${el.dataset.hidden ? ' is-hidden' : ''}" data-id="\${el.dataset.id}">
             \${cover ? \`<img src="\${cover}" alt="">\` : ''}
             <div class="label">\${el.dataset.artist}<br><span style="opacity:0.7">\${el.dataset.title}</span></div>
           </div>\`;
@@ -439,7 +447,7 @@ function getHTML(releases, films) {
         [...document.querySelectorAll('#film-list .item')].map(el => {
           const cover = el.dataset.cover;
           const isVid = !!el.dataset.vimeo;
-          return \`<div class="preview-card \${isVid && !cover ? 'vid-card' : ''}" data-id="\${el.dataset.id}">
+          return \`<div class="preview-card \${isVid && !cover ? 'vid-card' : ''}\${el.dataset.hidden ? ' is-hidden' : ''}" data-id="\${el.dataset.id}">
             \${isVid && !cover ? '▶' : ''}
             \${cover ? \`<img src="\${cover}" alt="">\` : ''}
             <div class="label">\${el.dataset.title}\${el.dataset.role ? \`<br><span style="opacity:0.7">\${el.dataset.role}</span>\` : ''}</div>
@@ -572,6 +580,7 @@ const server = http.createServer(async (req, res) => {
       const coverPath = body.cover ? await saveImage(body.cover, body.artist, body.title) : (r.cover || '');
       Object.assign(r, { artist: body.artist, title: body.title, type: body.type, year: body.year,
         link: body.link, cover: coverPath, credits: body.credits, label: body.label });
+      if (body.hidden) r.hidden = true; else delete r.hidden;
       fs.writeFileSync(MUSIC_JSON, JSON.stringify(releases, null, 2) + '\n');
       json(200, { ok: true });
     } catch (e) { json(500, { error: e.message }); }
@@ -597,6 +606,7 @@ const server = http.createServer(async (req, res) => {
       if (!f) { json(404, { error: 'not found' }); return; }
       const coverPath = body.cover ? await saveImage(body.cover, body.title, '') : (f.cover || '');
       Object.assign(f, { title: body.title, role: body.role, year: body.year, link: body.link, vimeo_id: body.vimeo_id, cover: coverPath });
+      if (body.hidden) f.hidden = true; else delete f.hidden;
       fs.writeFileSync(FILM_JSON, JSON.stringify(films, null, 2) + '\n');
       json(200, { ok: true });
     } catch (e) { json(500, { error: e.message }); }

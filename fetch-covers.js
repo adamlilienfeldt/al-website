@@ -81,7 +81,12 @@ function matchApple(results, artist, title) {
     const rt = normKey(r.collectionName) + normKey(r.trackName);
     if (key && rt.includes(key)) {
       const link = r.trackViewUrl || r.collectionViewUrl;
-      if (link) return link.split('?')[0];
+      if (!link) continue;
+      // Keep only ?i=<track>: for a song it points the page at that track,
+      // which matters when Apple files it on an EP or album, not a single.
+      const u = new URL(link);
+      const track = u.searchParams.get('i');
+      return `${u.origin}${u.pathname}${track ? `?i=${track}` : ''}`;
     }
   }
   return null;

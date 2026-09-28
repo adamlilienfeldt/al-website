@@ -2,6 +2,7 @@
 import { Picture } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import { SHOW_TYPE, SHOW_YEAR, SHOW_CREDITS, SHOW_LABEL } from '../config';
+import '../styles/prototype-popup.css'; // PROTOTYPE: popup variants
 
 interface Props {
   artist: string;
@@ -23,6 +24,8 @@ const coverSrc = cover;
 <div
   class:list={['card', { 'has-link': hasLink }]}
   data-link={link || ''}
+  data-artist={artist}
+  data-title={title}
   data-services={services && Object.keys(services).length ? JSON.stringify(services) : ''}
   role={hasLink ? 'button' : undefined}
   aria-haspopup={hasLink ? 'dialog' : undefined}
@@ -115,7 +118,7 @@ const coverSrc = cover;
     }
 
     // Build the <a> service links for a card; empty string if nothing to show.
-    function buildLinks(services: Record<string, string>, fallback: string): string {
+    function buildLinks(services: Record<string, string>, fallback: string, withLabels = false): string {
       const entries = Object.entries(SERVICES)
         .filter(([key]) => services[key])
         .map(([key, meta]) => ({ key, label: meta.label, icon: meta.icon, url: services[key] }));
@@ -125,7 +128,7 @@ const coverSrc = cover;
       return entries
         .map(
           (e) =>
-            `<a class="odesli-service${e.icon ? ' has-icon' : ''}" data-service="${e.key}" href="${esc(e.url)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(e.label)}" title="${esc(e.label)}">${e.icon || esc(e.label)}</a>`,
+            `<a class="odesli-service${e.icon ? ' has-icon' : ''}" data-service="${e.key}" href="${esc(e.url)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(e.label)}" title="${esc(e.label)}">${e.icon || esc(e.label)}${withLabels && e.icon ? `<span>${esc(e.label)}</span>` : ''}</a>`,
         )
         .join('');
     }
@@ -139,18 +142,80 @@ const coverSrc = cover;
       return { link, services, has: !!link || Object.keys(services).length > 0 };
     }
 
-    function openModal(card: HTMLElement) {
+    // ─── PROTOTYPE: popup variants (dev only), switched with ?variant= ───
+    const VARIANT = import.meta.env.DEV
+      ? new URLSearchParams(location.search).get('variant') || 'A'
+      : 'A';
+
+    // Biggest image the card's <picture> offers (the grid shows a smaller one).
+    function largestSrc(card: HTMLElement): string {
+      const set = card.querySelector('source')?.getAttribute('srcset') || '';
+      const last = set.split(',').pop()?.trim().split(' ')[0];
+      const img = card.querySelector('img');
+      return last || img?.currentSrc || img?.src || '';
+    }
+
+    function renderPopup(card: HTMLElement): string {
       const { link, services } = cardData(card);
       const img = card.querySelector('img');
-      const heading = card.querySelector('.card-heading')?.textContent || '';
+      const artist = esc(card.dataset.artist || '');
+      const title = esc(card.dataset.title || '');
+      const heading = esc(card.querySelector('.card-heading')?.textContent || '');
+      const credits = esc(card.querySelector('.card-credits')?.textContent || '');
+      const label = esc(card.querySelector('.card-label')?.textContent || '');
+      const row = `<div class="odesli-services-row">${buildLinks(services, link)}</div>`;
+      const big = esc(largestSrc(card));
+      const info = `${credits ? `<p class="pp-credits">${credits}</p>` : ''}${label ? `<p class="pp-label">${label}</p>` : ''}`;
+
+      if (VARIANT === 'B') return `
+        ${big ? `<img class="pp-cover-lg" src="${big}" alt="">` : ''}
+        <div class="pp-meta"><p class="pp-title">${heading}</p>${info}</div>
+        ${row}`;
+      if (VARIANT === 'C') return `
+        <div class="pp-split">
+          ${big ? `<img class="pp-cover-md" src="${big}" alt="">` : ''}
+          <div class="pp-side">
+            <p class="pp-artist">${artist}</p>
+            <p class="pp-title">${title}</p>
+            ${info}
+            <div class="pp-list">${buildLinks(services, link, true)}</div>
+          </div>
+        </div>`;
+      if (VARIANT === 'D') return `
+        ${big ? `<img class="pp-cover-xl" src="${big}" alt="">` : ''}
+        <div class="pp-meta"><p class="pp-title">${heading}</p>${info}</div>
+        ${row}`;
+      // A: current production popup
       const thumb = img ? `<img class="odesli-modal-cover" src="${esc(img.currentSrc || img.src)}" alt="">` : '';
-      const titleEl = heading ? `<p class="odesli-modal-title">${esc(heading)}</p>` : '';
-      servicesEl.innerHTML = thumb + titleEl + `<div class="odesli-services-row">${buildLinks(services, link)}</div>`;
-      modal!.setAttribute('aria-label', heading || 'Listen');
+      return thumb + (heading ? `<p class="odesli-modal-title">${heading}</p>` : '') + row;
+    }
+
+    function openModal(card: HTMLElement) {
+      servicesEl.innerHTML = renderPopup(card);
+      modal!.dataset.variant = VARIANT;
+      modal!.setAttribute('aria-label', card.querySelector('.card-heading')?.textContent || 'Listen');
+      // PROTOTYPE: remember the open card so switching variants reopens it, and
+      // lift the switcher into the dialog (the page behind a modal is inert).
+      if (import.meta.env.DEV) {
+        const u = new URL(location.href);
+        u.searchParams.set('card', String([...cards].indexOf(card)));
+        history.replaceState(null, '', u);
+        const sw = document.getElementById('proto-switcher');
+        if (sw) modal!.appendChild(sw);
+      }
       modal!.showModal();
     }
     function closeModal() {
       modal!.close();
+    }
+    if (import.meta.env.DEV) {
+      modal.addEventListener('close', () => {
+        const u = new URL(location.href);
+        u.searchParams.delete('card');
+        history.replaceState(null, '', u);
+        const sw = document.getElementById('proto-switcher');
+        if (sw) document.body.appendChild(sw);
+      });
     }
 
     function openFromCard(card: HTMLElement) {
@@ -214,4 +279,11 @@ const coverSrc = cover;
   }
 
   initCards();
+
+  // PROTOTYPE: reopen the card that was open before a variant switch.
+  if (import.meta.env.DEV) {
+    const i = new URLSearchParams(location.search).get('card');
+    const card = i ? document.querySelectorAll<HTMLElement>('.card')[Number(i)] : null;
+    if (card) card.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+  }
 </script>

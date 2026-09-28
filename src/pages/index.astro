@@ -6,6 +6,7 @@ import releases from '../data/music.json';
 import { resolveCover } from '../lib/covers';
 import { SHOW_PHOTO } from '../config';
 import heroPhoto from '../assets/_DSC5353-1.jpeg';
+import PrototypeSwitcher from '../components/PrototypeSwitcher.astro'; // PROTOTYPE
 
 // `"hidden": true` in music.json keeps an entry in the data but off the site.
 const sorted = releases.filter((r) => !(r as any).hidden).sort((a, b) => {
@@ -45,6 +46,13 @@ const sorted = releases.filter((r) => !(r as any).hidden).sort((a, b) => {
       />
     ))}
   </div>
+  <!-- PROTOTYPE: popup variants. Click a cover, then flip with ← → -->
+  <PrototypeSwitcher variants={[
+    ['A', 'current'],
+    ['B', 'big cover + info'],
+    ['C', 'side by side, named links'],
+    ['D', 'lightbox'],
+  ]} />
 </Layout>
 
 <script>

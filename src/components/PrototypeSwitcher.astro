@@ -1,0 +1,77 @@
+---
+// PROTOTYPE: floating variant switcher, dev only. Throw away with the prototype.
+interface Props {
+  variants: [string, string][];
+}
+const { variants } = Astro.props;
+---
+
+{import.meta.env.DEV && (
+  <div id="proto-switcher" data-variants={JSON.stringify(variants)}>
+    <button type="button" data-dir="-1" aria-label="Previous variant">←</button>
+    <span id="proto-label"></span>
+    <button type="button" data-dir="1" aria-label="Next variant">→</button>
+  </div>
+)}
+
+<script>
+  const bar = document.getElementById('proto-switcher');
+  if (bar) {
+    const variants: [string, string][] = JSON.parse(bar.dataset.variants || '[]');
+    const params = new URLSearchParams(location.search);
+    const current = Math.max(0, variants.findIndex(([k]) => k === (params.get('variant') || variants[0][0])));
+    const [key, name] = variants[current];
+    document.getElementById('proto-label')!.textContent = `${key} — ${name}`;
+
+    // Reload with the new variant; ReleaseCard reopens the same cover via ?card=.
+    const go = (dir: number) => {
+      const next = variants[(current + dir + variants.length) % variants.length][0];
+      const u = new URL(location.href);
+      u.searchParams.set('variant', next);
+      location.replace(u);
+    };
+    bar.addEventListener('click', (e) => {
+      const dir = (e.target as HTMLElement).closest<HTMLElement>('[data-dir]')?.dataset.dir;
+      if (dir) go(Number(dir));
+    });
+    document.addEventListener('keydown', (e) => {
+      const t = e.target as HTMLElement;
+      if (t.closest('input, textarea, [contenteditable]')) return;
+      if (e.key === 'ArrowLeft') go(-1);
+      if (e.key === 'ArrowRight') go(1);
+    });
+  }
+</script>
+
+<style is:global>
+  #proto-switcher {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px;
+    background: #ff3b7f;
+    color: #fff;
+    border-radius: 999px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    font: 500 13px/1 system-ui, sans-serif;
+    white-space: nowrap;
+  }
+  #proto-switcher button {
+    border: 0;
+    background: rgba(255, 255, 255, 0.2);
+    color: inherit;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 15px;
+  }
+  #proto-switcher button:hover {
+    background: rgba(255, 255, 255, 0.35);
+  }
+</style>

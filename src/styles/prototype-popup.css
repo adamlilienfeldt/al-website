@@ -1,0 +1,57 @@
+/* PROTOTYPE: popup variants B–D, keyed off data-variant on the dialog.
+   A is the production styling in global.css. Throw away with the prototype. */
+
+.pp-title { font-size: 17px; font-weight: 100; }
+.pp-credits, .pp-label { font-size: 14px; font-weight: 300; color: var(--text-secondary); line-height: 1.4; }
+.pp-meta { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; max-width: 440px; }
+
+/* B — big cover + info, same card */
+.odesli-modal[data-variant="B"] .odesli-modal-content { padding: 28px; }
+.pp-cover-lg {
+  width: min(440px, 76vw, 55vh);
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 4px;
+  display: block;
+}
+
+/* C — cover left, info + named links right; stacks on phones */
+.odesli-modal[data-variant="C"] .odesli-modal-content { padding: 28px; }
+.pp-split { display: flex; gap: 28px; align-items: stretch; }
+.pp-cover-md { width: min(360px, 40vw); aspect-ratio: 1; object-fit: cover; border-radius: 4px; display: block; }
+.pp-side { display: flex; flex-direction: column; gap: 4px; min-width: 220px; max-width: 280px; }
+.pp-artist { font-size: 14px; font-weight: 300; color: var(--text-secondary); }
+.pp-side .pp-title { font-size: 22px; margin-bottom: 8px; }
+.pp-list { display: flex; flex-direction: column; gap: 2px; margin-top: auto; padding-top: 20px; }
+.pp-list .odesli-service.has-icon {
+  width: auto;
+  height: auto;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 8px 0;
+  font-size: 14px;
+  font-weight: 300;
+  border-top: 1px solid var(--rule);
+}
+.pp-list .odesli-service:hover { transform: none; }
+.pp-list .odesli-service svg { width: 20px; height: 20px; flex-shrink: 0; }
+@media (max-width: 600px) {
+  .pp-split { flex-direction: column; gap: 16px; }
+  .pp-cover-md { width: min(300px, 70vw); }
+  .pp-side { max-width: none; }
+}
+
+/* D — lightbox: no card, dark backdrop, cover as big as the screen allows */
+.odesli-modal[data-variant="D"]::backdrop { background: rgba(0, 0, 0, 0.92); }
+.odesli-modal[data-variant="D"] .odesli-modal-content { background: none; border: 0; padding: 0; }
+.pp-cover-xl {
+  width: min(660px, 90vw, 62vh);
+  aspect-ratio: 1;
+  object-fit: cover;
+  display: block;
+}
+.odesli-modal[data-variant="D"] .pp-title { color: #fff; }
+.odesli-modal[data-variant="D"] .pp-credits,
+.odesli-modal[data-variant="D"] .pp-label { color: rgba(255, 255, 255, 0.65); }
+.odesli-modal[data-variant="D"] .odesli-service { color: #fff; }
+.odesli-modal[data-variant="D"] .odesli-service:hover { color: rgba(255, 255, 255, 0.7); }

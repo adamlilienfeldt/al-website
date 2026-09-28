@@ -118,14 +118,14 @@ const coverSrc = cover;
     function buildLinks(services: Record<string, string>, fallback: string): string {
       const entries = Object.entries(SERVICES)
         .filter(([key]) => services[key])
-        .map(([key, meta]) => ({ label: meta.label, icon: meta.icon, url: services[key] }));
+        .map(([key, meta]) => ({ key, label: meta.label, icon: meta.icon, url: services[key] }));
       if (entries.length === 0 && fallback) {
-        entries.push({ label: 'Open in streaming app', icon: '', url: fallback });
+        entries.push({ key: '', label: 'Open in streaming app', icon: '', url: fallback });
       }
       return entries
         .map(
           (e) =>
-            `<a class="odesli-service${e.icon ? ' has-icon' : ''}" href="${esc(e.url)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(e.label)}" title="${esc(e.label)}">${e.icon || esc(e.label)}</a>`,
+            `<a class="odesli-service${e.icon ? ' has-icon' : ''}" data-service="${e.key}" href="${esc(e.url)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(e.label)}" title="${esc(e.label)}">${e.icon || esc(e.label)}</a>`,
         )
         .join('');
     }
@@ -156,6 +156,20 @@ const coverSrc = cover;
     function openFromCard(card: HTMLElement) {
       if (cardData(card).has) openModal(card);
     }
+
+    // Mac: open Apple Music links in the Music app, which every Mac ships
+    // with. Elsewhere the https link is fine: phones open the app through
+    // universal links, and other computers may not have it.
+    const isMacDesktop =
+      /Macintosh|Mac OS X/.test(navigator.userAgent) &&
+      window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    servicesEl.addEventListener('click', (e) => {
+      const a = (e.target as Element).closest<HTMLAnchorElement>('a[data-service="appleMusic"]');
+      const m = a?.href.match(/^https:\/\/(?:geo\.)?music\.apple\.com(\/.*)$/);
+      if (!isMacDesktop || !m) return;
+      e.preventDefault();
+      window.location.href = `music://music.apple.com${m[1]}`;
+    });
 
     closeBtn.addEventListener('click', closeModal);
     modal.addEventListener('click', (e) => {

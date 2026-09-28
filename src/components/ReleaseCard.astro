@@ -139,14 +139,38 @@ const coverSrc = cover;
       return { link, services, has: !!link || Object.keys(services).length > 0 };
     }
 
+    // Cover size in the popup; keep in sync with .odesli-modal-cover in global.css.
+    const MODAL_COVER_SIZES = 'min(440px, 76vw, 55vh)';
+
     function openModal(card: HTMLElement) {
       const { link, services } = cardData(card);
-      const img = card.querySelector('img');
-      const heading = card.querySelector('.card-heading')?.textContent || '';
-      const thumb = img ? `<img class="odesli-modal-cover" src="${esc(img.currentSrc || img.src)}" alt="">` : '';
-      const titleEl = heading ? `<p class="odesli-modal-title">${esc(heading)}</p>` : '';
-      servicesEl.innerHTML = thumb + titleEl + `<div class="odesli-services-row">${buildLinks(services, link)}</div>`;
-      modal!.setAttribute('aria-label', heading || 'Listen');
+      const text = (sel: string) => esc(card.querySelector(sel)?.textContent || '');
+      const heading = text('.card-heading');
+      // Credits and label come from the card overlay, so the SHOW_* config
+      // flags apply here too.
+      const credits = text('.card-credits');
+      const label = text('.card-label');
+      servicesEl.innerHTML = `
+        <div class="odesli-modal-meta">
+          ${heading ? `<p class="odesli-modal-title">${heading}</p>` : ''}
+          ${credits ? `<p class="odesli-modal-info">${credits}</p>` : ''}
+          ${label ? `<p class="odesli-modal-info">${label}</p>` : ''}
+        </div>
+        <div class="odesli-services-row">${buildLinks(services, link)}</div>`;
+
+      // Reuse the card's own <picture> so the browser still picks format and
+      // resolution, just for the popup's larger size.
+      const picture = card.querySelector('picture')?.cloneNode(true) as HTMLElement | undefined;
+      if (picture) {
+        picture.querySelectorAll('source, img').forEach((el) => el.setAttribute('sizes', MODAL_COVER_SIZES));
+        const img = picture.querySelector('img')!;
+        img.className = 'odesli-modal-cover';
+        img.alt = '';
+        img.loading = 'eager';
+        servicesEl.prepend(picture);
+      }
+
+      modal!.setAttribute('aria-label', card.querySelector('.card-heading')?.textContent || 'Listen');
       modal!.showModal();
     }
     function closeModal() {

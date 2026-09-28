@@ -62,8 +62,11 @@ npm run fetch-covers
 
 This, for every entry missing a `cover` or `services`:
 
-- downloads the album art, resizes it, and writes it to
-  `src/assets/covers/<artist-title>.jpg`
+- downloads the album art (up to 1400px) and writes it to
+  `src/assets/covers/<artist-title>.jpg`. It prefers Apple's artwork, which
+  comes at full size; Spotify's (via `song.link`) tops out at 640px. Apple's is
+  only used when Apple lists the same release: if a single only exists there as
+  a track on an EP or album, that cover would be the wrong one.
 - sets `"cover": "/images/<artist-title>.jpg"` (a logical key — the file actually
   lives in `src/assets/covers/`, see [`src/lib/covers.ts`](src/lib/covers.ts))
 - scrapes the `song.link` page for the streaming links and writes `"services"`
@@ -78,6 +81,16 @@ npm run fetch-covers -- --force
 ```
 
 `--force` never overwrites richer data with a thinner response.
+
+To re-download existing covers from the best source (e.g. after Apple adds a
+release, or to upgrade small ones):
+
+```bash
+npm run fetch-covers -- --covers
+```
+
+A cover is only replaced when the new image is bigger, so hand-picked or
+larger files are never downgraded. It keeps each cover's current filename.
 
 > **Why a page scrape, not the Odesli API?** The free API rate-limits hard and
 > 400s on its own shortlinks. The public `song.link` page carries the full link

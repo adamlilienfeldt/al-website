@@ -13,7 +13,8 @@ const PUBLIC     = path.join(__dir, 'public');
 // `cover` field keeps its logical "/images/<file>" form; covers.ts matches on
 // the bare filename. Mirrors fetch-covers.js.
 const COVERS_DIR = path.join(__dir, 'src/assets/covers');
-const MAX_EDGE   = 660;
+// Stored originals; astro:assets derives delivered sizes. Mirrors fetch-covers.js.
+const MAX_EDGE   = 1400;
 // Film posters render up to a third of the page width, so keep more pixels.
 // Mirrors FILM_MAX_EDGE in fetch-covers.js.
 const FILM_MAX_EDGE = 1280;
@@ -39,7 +40,7 @@ async function saveImage(cover, artist, title, maxEdge = MAX_EDGE) {
   const filename = `${slugify(`${artist}-${title}`)}.jpg`;
   const output = await sharp(input)
     .resize({ width: maxEdge, height: maxEdge, fit: 'inside', withoutEnlargement: true })
-    .jpeg({ quality: 82, mozjpeg: true })
+    .jpeg({ quality: 90, mozjpeg: true })
     .toBuffer();
   fs.writeFileSync(path.join(COVERS_DIR, filename), output);
   return `/images/${filename}`;

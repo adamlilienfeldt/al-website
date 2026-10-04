@@ -1,0 +1,213 @@
+<!doctype html>
+<!-- Mockup: al-website redesign inspired by ad93.ltd. Open directly in a browser. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>adam lilienfeldt — mockup</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital@0;1&display=swap">
+<style>
+  :root {
+    --paper: #ffffff;
+    --ink: #000000;
+    --text: #7d7d7d;
+    --line: rgba(0, 0, 0, .3);
+    --sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --serif: "EB Garamond", Garamond, serif;
+    --size: 11px;
+    --lh: 12px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --paper: #0d0d0d; --ink: #ffffff; --text: #8a8a8a; --line: rgba(255,255,255,.3); color-scheme: dark; }
+  }
+  :root[data-theme="dark"] { --paper: #0d0d0d; --ink: #ffffff; --text: #8a8a8a; --line: rgba(255,255,255,.3); color-scheme: dark; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; background: var(--paper); }
+  body {
+    font: 300 var(--size)/var(--lh) var(--sans);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+  }
+  a, button { color: inherit; font: inherit; background: none; border: 0; cursor: pointer; text-decoration: none; }
+  a:hover, button:hover, button[aria-pressed="true"] { color: var(--ink); }
+  :focus-visible { outline: 1px solid var(--ink); outline-offset: 2px; }
+  .serif { font-family: var(--serif); font-size: 13px; line-height: 13px; }
+  ::-webkit-scrollbar { width: 0; height: 0; }
+
+  /* Top: horizontal cover strip. */
+  .strip {
+    position: fixed; top: 0; left: 0; right: 0;
+    display: flex; gap: 1.25px; overflow-x: auto;
+    scroll-snap-type: x mandatory; scroll-behavior: smooth;
+    transition: transform 1s, opacity 1s;
+  }
+  body.hide-strip .strip { transform: translateY(-100%); opacity: 0; }
+  .strip section { flex: 0 0 30vw; scroll-snap-align: start; }
+  .strip img {
+    display: block; width: 100%; aspect-ratio: 1; max-height: 57.5vh;
+    object-fit: cover; cursor: pointer; transition: filter .4s;
+  }
+  .strip.dim section:not(.active) img { filter: grayscale(1) opacity(.35); }
+  .info {
+    display: flex; justify-content: space-between; gap: 16px;
+    padding: 8px 6px 0; height: 0; opacity: 0; overflow: hidden;
+    transition: height .5s, opacity .5s;
+  }
+  section.active .info { height: 56px; opacity: 1; }
+  .info .links { text-align: right; display: flex; flex-direction: column; gap: 2px; }
+  .info .links a:hover { text-decoration: underline; }
+
+  /* Bottom: fixed UI, ad93-style, starting at ~77vh. */
+  .ui {
+    position: fixed; left: 5vw; right: 5vw; top: 77.5vh; bottom: 0;
+    display: grid; grid-template-columns: 1fr 1fr 200px; gap: 24px;
+  }
+  .menu { display: flex; gap: 14px; }
+  .lockup { margin-top: 1.4vh; }
+  .wordmark { font: italic 34px/1 var(--serif); color: var(--ink); letter-spacing: -.01em; }
+  .lockup p { margin-top: 10px; max-width: 260px; }
+
+  /* Archive list: typed index, like ad93's WHYT catalogue. */
+  .archive {
+    position: fixed; left: 62.5vw; right: 5vw; bottom: 22.5vh; max-height: 60vh;
+    overflow-y: auto; opacity: 0; pointer-events: none; transition: opacity .4s;
+    background: var(--paper);
+  }
+  body.show-archive .archive { opacity: 1; pointer-events: auto; }
+  .row {
+    display: grid; grid-template-columns: 1.1fr 1.5fr .9fr; gap: 10px;
+    width: 100%; text-align: left; padding: 4px 0; border-bottom: .5px solid var(--line);
+  }
+  .row span:last-child { text-align: right; }
+
+  .contact p { margin-bottom: 6px; }
+  .contact a { display: block; }
+  .contact a:hover { text-decoration: underline; }
+  .count { font-variant-numeric: tabular-nums; }
+
+  @media (max-width: 750px) {
+    :root { --size: 9px; --lh: 10px; }
+    .strip section { flex-basis: 72vw; }
+    .strip img { max-height: 46vh; }
+    .ui { top: auto; bottom: 4vh; display: flex; flex-direction: column; gap: 12px; }
+    .contact { display: flex; gap: 24px; }
+    .wordmark { font-size: 26px; }
+    .archive { left: 16px; right: 16px; top: 48vh; bottom: 24vh; max-height: none; }
+    .count { display: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="strip" id="strip"></div>
+
+  <div class="archive" id="archive" aria-label="Archive"></div>
+
+  <div class="ui">
+    <div>
+      <nav class="menu">
+        <button data-view="music" aria-pressed="true">Music</button>
+        <button data-view="film" aria-pressed="false">Film</button>
+        <button id="archiveBtn" aria-pressed="false">Archive</button>
+      </nav>
+      <div class="lockup">
+        <div class="wordmark">adam lilienfeldt</div>
+        <p>Producer, engineer, musician and composer, Copenhagen<br>© 2018 — 2026</p>
+      </div>
+    </div>
+    <div class="count serif" id="count"></div>
+    <div class="contact">
+      <p>General:<br><a href="mailto:lilienfeldt.adam@gmail.com">lilienfeldt.adam@gmail.com</a></p>
+      <p>Listen:<br>
+        <a href="https://open.spotify.com/playlist/4rTHpry598NrYFQDMYMTIU" target="_blank" rel="noopener">Spotify</a>
+        <a href="https://www.discogs.com/artist/6201540-Adam-Lilienfeldt" target="_blank" rel="noopener">Discogs</a>
+      </p>
+    </div>
+  </div>
+
+<script src="data.js"></script>
+<script>
+  const SERVICE_LABELS = { spotify: 'Spotify', appleMusic: 'Apple Music', tidal: 'Tidal', youtubeMusic: 'YouTube Music', youtube: 'YouTube' };
+  const strip = document.getElementById('strip');
+  const archive = document.getElementById('archive');
+  const count = document.getElementById('count');
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+  let view = 'music';
+
+  function links(r) {
+    const s = Object.entries(SERVICE_LABELS).filter(([k]) => r.services[k])
+      .map(([k, label]) => `<a href="${esc(r.services[k])}" target="_blank" rel="noopener">${label}</a>`);
+    if (!s.length && r.link) s.push(`<a href="${esc(r.link)}" target="_blank" rel="noopener">${view === 'film' ? 'Watch' : 'Listen'}</a>`);
+    return s.join('');
+  }
+
+  function render() {
+    const items = DATA[view];
+    strip.innerHTML = items.map((r, i) => `
+      <section data-i="${i}">
+        <img src="${esc(r.cover)}" alt="${esc(r.title)} — ${esc(r.artist)}" loading="lazy" tabindex="0">
+        <div class="info">
+          <div>
+            <p style="color:var(--ink)">${esc(r.artist)}</p>
+            <p>${esc(r.title)}</p>
+            <p class="serif" style="margin-top:4px">${esc(r.credits)}</p>
+          </div>
+          <div class="links"><span class="serif">${esc(r.label)}</span>${links(r)}</div>
+        </div>
+      </section>`).join('');
+    archive.innerHTML = items.map((r, i) => `
+      <button class="row" data-i="${i}">
+        <span>${esc(r.artist)}</span><span>${esc(r.title)}</span><span class="serif">${esc(r.label)}</span>
+      </button>`).join('');
+    count.textContent = `${items.length} ${view === 'film' ? 'films' : 'records'}`;
+    strip.scrollLeft = 0;
+  }
+
+  function activate(i, scroll) {
+    const sections = strip.querySelectorAll('section');
+    const was = sections[i]?.classList.contains('active');
+    sections.forEach((s) => s.classList.remove('active'));
+    strip.classList.toggle('dim', !was);
+    if (was) return;
+    sections[i].classList.add('active');
+    if (scroll) sections[i].scrollIntoView({ inline: 'start', block: 'nearest' });
+  }
+
+  strip.addEventListener('click', (e) => {
+    const s = e.target.closest('img') && e.target.closest('section');
+    if (s) activate(+s.dataset.i);
+  });
+  strip.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && e.target.matches('img')) activate(+e.target.closest('section').dataset.i);
+  });
+  // Vertical wheel scrolls the strip sideways.
+  strip.addEventListener('wheel', (e) => {
+    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) { strip.scrollLeft += e.deltaY; e.preventDefault(); }
+  }, { passive: false });
+
+  archive.addEventListener('mouseover', (e) => {
+    const row = e.target.closest('.row');
+    if (row) strip.querySelectorAll('section')[row.dataset.i].scrollIntoView({ inline: 'start', block: 'nearest' });
+  });
+  archive.addEventListener('click', (e) => {
+    const row = e.target.closest('.row');
+    if (!row) return;
+    document.body.classList.remove('show-archive');
+    document.getElementById('archiveBtn').setAttribute('aria-pressed', 'false');
+    activate(+row.dataset.i, true);
+  });
+
+  document.getElementById('archiveBtn').addEventListener('click', (e) => {
+    const on = document.body.classList.toggle('show-archive');
+    e.currentTarget.setAttribute('aria-pressed', on);
+  });
+  document.querySelectorAll('[data-view]').forEach((b) => b.addEventListener('click', () => {
+    view = b.dataset.view;
+    document.querySelectorAll('[data-view]').forEach((x) => x.setAttribute('aria-pressed', x === b));
+    document.body.classList.add('hide-strip');
+    setTimeout(() => { render(); strip.classList.remove('dim'); document.body.classList.remove('hide-strip'); }, 600);
+  }));
+
+  render();
+</script>
+</body>
+</html>

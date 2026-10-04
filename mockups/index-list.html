@@ -1,0 +1,168 @@
+<!doctype html>
+<!-- Mockup A "Index": text-first credit list, cover follows the cursor. Open directly in a browser. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lilienfeldt Index Mockup</title>
+<style>
+  /* Layout: one typeset list, full width; images only on hover. */
+  :root {
+    --paper: #fafafa;
+    --ink: #121212;
+    --mute: #9a9a9a;
+    --rule: #e4e4e4;
+    --sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --big: clamp(22px, 3.4vw, 46px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --paper: #111; --ink: #ededed; --mute: #6e6e6e; --rule: #262626; color-scheme: dark; }
+  }
+  :root[data-theme="dark"] { --paper: #111; --ink: #ededed; --mute: #6e6e6e; --rule: #262626; color-scheme: dark; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--paper); color: var(--ink);
+    font: 400 13px/1.35 var(--sans); -webkit-font-smoothing: antialiased;
+    padding: 0 max(16px, 3vw) 12vh;
+  }
+  a, button { color: inherit; font: inherit; background: none; border: 0; cursor: pointer; text-decoration: none; }
+  :focus-visible { outline: 1px solid var(--ink); outline-offset: 3px; }
+
+  header {
+    display: grid; grid-template-columns: 1fr 1fr auto; gap: 24px;
+    padding-block: 28px 18vh; align-items: start;
+  }
+  header .who { font-weight: 500; }
+  header p, header a { color: var(--mute); }
+  header a:hover { color: var(--ink); }
+  header .contact { text-align: right; }
+  .filters { display: flex; gap: 18px; margin-bottom: 14px; }
+  .filters button { color: var(--mute); }
+  .filters button[aria-pressed="true"] { color: var(--ink); }
+  .filters sup { font-size: 9px; margin-left: 2px; font-variant-numeric: tabular-nums; }
+
+  ol { list-style: none; border-top: 1px solid var(--rule); }
+  li { border-bottom: 1px solid var(--rule); }
+  .row {
+    display: grid; grid-template-columns: 3ch minmax(0, 1fr) minmax(0, 1fr) 16ch;
+    gap: 16px; align-items: baseline; width: 100%; text-align: left; padding: 10px 0;
+  }
+  .row .n { color: var(--mute); font-size: 11px; font-variant-numeric: tabular-nums; }
+  .row .a, .row .t { font-size: var(--big); line-height: 1.05; letter-spacing: -.025em; text-wrap: balance; }
+  .row .t { color: var(--mute); }
+  .row .k { color: var(--mute); text-align: right; font-size: 11px; }
+  ol:hover .row .a { color: var(--mute); }
+  ol .row:hover .a, li.open .row .a { color: var(--ink); }
+
+  .more { display: none; grid-template-columns: 3ch minmax(0, 1fr) minmax(0, 1fr) 16ch; gap: 16px; padding: 4px 0 22px; }
+  li.open .more { display: grid; }
+  .more img { display: none; }
+  .more .credits { grid-column: 2; color: var(--mute); }
+  .more .links { grid-column: 3; display: flex; flex-wrap: wrap; gap: 4px 16px; }
+  .more .links a { border-bottom: 1px solid var(--rule); }
+  .more .links a:hover { border-color: var(--ink); }
+
+  /* Floating cover that trails the pointer. */
+  .float {
+    position: fixed; left: 0; top: 0; width: min(26vw, 340px); aspect-ratio: 1; object-fit: cover;
+    pointer-events: none; opacity: 0; transition: opacity .2s; z-index: 2;
+  }
+  .float.on { opacity: 1; }
+  footer { margin-top: 10vh; color: var(--mute); display: flex; justify-content: space-between; }
+
+  @media (hover: none), (max-width: 700px) {
+    .float { display: none; }
+    header { grid-template-columns: 1fr; padding-bottom: 8vh; gap: 8px; }
+    header .contact { text-align: left; }
+    .row { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+    .row .n, .row .k { display: none; }
+    .more { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+    .more img { display: block; width: 100%; max-width: 100%; aspect-ratio: 1; object-fit: cover; }
+    .more .credits, .more .links { grid-column: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) { .float { transition: none; } }
+</style>
+</head>
+<body>
+  <header>
+    <div class="who">Adam Lilienfeldt</div>
+    <p>Producer, engineer, musician and composer based in Copenhagen.</p>
+    <p class="contact">
+      <a href="mailto:lilienfeldt.adam@gmail.com">lilienfeldt.adam@gmail.com</a><br>
+      <a href="https://open.spotify.com/playlist/4rTHpry598NrYFQDMYMTIU" target="_blank" rel="noopener">Spotify</a> ·
+      <a href="https://www.discogs.com/artist/6201540-Adam-Lilienfeldt" target="_blank" rel="noopener">Discogs</a>
+    </p>
+  </header>
+
+  <nav class="filters" id="filters"></nav>
+  <ol id="list"></ol>
+  <img class="float" id="float" alt="">
+  <footer><span>Copenhagen</span><span>© 2026</span></footer>
+
+<script src="data.js"></script>
+<script>
+  const SERVICE_LABELS = { spotify: 'Spotify', appleMusic: 'Apple Music', tidal: 'Tidal', youtubeMusic: 'YouTube Music', youtube: 'YouTube' };
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+  const all = [
+    ...DATA.music.map((r) => ({ ...r, kind: 'music' })),
+    ...DATA.film.map((r) => ({ ...r, kind: 'film' })),
+  ];
+  const list = document.getElementById('list');
+  const float = document.getElementById('float');
+  const filters = document.getElementById('filters');
+  let filter = 'all';
+
+  function links(r) {
+    const s = Object.entries(SERVICE_LABELS).filter(([k]) => r.services[k])
+      .map(([k, l]) => `<a href="${esc(r.services[k])}" target="_blank" rel="noopener">${l}</a>`);
+    if (!s.length && r.link) s.push(`<a href="${esc(r.link)}" target="_blank" rel="noopener">${r.kind === 'film' ? 'Watch' : 'Listen'}</a>`);
+    return s.join('');
+  }
+
+  function render() {
+    const items = all.filter((r) => filter === 'all' || r.kind === filter);
+    filters.innerHTML = ['all', 'music', 'film'].map((f) => {
+      const n = f === 'all' ? all.length : all.filter((r) => r.kind === f).length;
+      return `<button data-f="${f}" aria-pressed="${f === filter}">${f[0].toUpperCase() + f.slice(1)}<sup>${n}</sup></button>`;
+    }).join('');
+    list.innerHTML = items.map((r, i) => `
+      <li>
+        <button class="row" data-cover="${esc(r.cover)}" aria-expanded="false">
+          <span class="n">${String(i + 1).padStart(2, '0')}</span>
+          <span class="a">${esc(r.artist)}</span>
+          <span class="t">${esc(r.title)}</span>
+          <span class="k">${esc(r.label)}</span>
+        </button>
+        <div class="more">
+          <img src="${esc(r.cover)}" alt="" loading="lazy">
+          <p class="credits">${esc(r.credits)}</p>
+          <div class="links">${links(r)}</div>
+        </div>
+      </li>`).join('');
+  }
+
+  filters.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-f]');
+    if (b) { filter = b.dataset.f; render(); }
+  });
+  list.addEventListener('click', (e) => {
+    const row = e.target.closest('.row');
+    if (!row) return;
+    const open = row.parentElement.classList.toggle('open');
+    row.setAttribute('aria-expanded', open);
+  });
+  list.addEventListener('mouseover', (e) => {
+    const row = e.target.closest('.row');
+    if (row) { float.src = row.dataset.cover; float.classList.add('on'); }
+  });
+  list.addEventListener('mouseleave', () => float.classList.remove('on'));
+  addEventListener('mousemove', (e) => {
+    const w = float.offsetWidth;
+    const x = e.clientX + 24 + w > innerWidth ? e.clientX - w - 24 : e.clientX + 24;
+    float.style.transform = `translate(${x}px, ${e.clientY - w / 2}px)`;
+  });
+
+  render();
+</script>
+</body>
+</html>

@@ -4,6 +4,12 @@ Mockup: [`ad93.html`](ad93.html) (open locally; reads `data.js`, covers from `sr
 Published copy: https://claude.ai/artifact/VGMBHJVn2ZrP7yH4yNbCpA (private).
 Reference: https://ad93.ltd/ (stylesheet: https://ad93.ltd/assets/scss/stylesheet.css).
 
+Alternatives (same data, also throwaway):
+- **A: Index**, [`index-list.html`](index-list.html): text-first list, cover follows the cursor. https://claude.ai/artifact/QsQkoswnYcPSfYL1odcdcV
+- **B: One at a time**, [`single.html`](single.html): one big cover, counter, thumbnail scrubber, lowercase mono. https://claude.ai/artifact/P5wZJHiMzfamBEftNaAsrF
+
+The plan below is written for the AD93 version; most of it (tokens, Layout, card → new component, server-rendered lists) carries over to A or B.
+
 The mockup is throwaway. Port the look into the Astro site; don't ship `ad93.html` or `data.js`.
 
 ## Decide first

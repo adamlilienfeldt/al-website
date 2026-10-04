@@ -1,0 +1,169 @@
+<!doctype html>
+<!-- Mockup B "One at a time": single cover viewer with a thumbnail scrubber. Open directly in a browser. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lilienfeldt Viewer Mockup</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* Layout: one screen. Bar, one centred cover, caption, thumbnail scrubber. */
+  :root {
+    --paper: #f3f3f1;
+    --ink: #1a1a1a;
+    --mute: #8c8c88;
+    --faint: rgba(0, 0, 0, .08);
+    --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    --cover: min(58vh, 82vw);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --paper: #161616; --ink: #e8e8e4; --mute: #74746f; --faint: rgba(255,255,255,.08); color-scheme: dark; }
+  }
+  :root[data-theme="dark"] { --paper: #161616; --ink: #e8e8e4; --mute: #74746f; --faint: rgba(255,255,255,.08); color-scheme: dark; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--paper); color: var(--ink);
+    font: 400 11px/1.5 var(--mono); text-transform: lowercase;
+    display: grid; grid-template-rows: auto 1fr auto auto; overflow: hidden;
+  }
+  a, button { color: inherit; font: inherit; text-transform: inherit; background: none; border: 0; cursor: pointer; text-decoration: none; }
+  :focus-visible { outline: 1px solid var(--ink); outline-offset: 3px; }
+
+  .bar { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; padding: 20px max(16px, 3vw); }
+  .bar nav { display: flex; gap: 16px; }
+  .bar nav button, .bar a { color: var(--mute); }
+  .bar nav button[aria-pressed="true"], .bar a:hover { color: var(--ink); }
+
+  .track {
+    display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth;
+    scrollbar-width: none; min-height: 0;
+  }
+  .track::-webkit-scrollbar { display: none; }
+  .slide { flex: 0 0 100%; scroll-snap-align: center; display: grid; place-items: center; }
+  .slide img { width: var(--cover); max-width: 100%; aspect-ratio: 1; object-fit: cover; box-shadow: 0 30px 60px -30px rgba(0,0,0,.35); }
+
+  .caption {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 16px;
+    padding: 0 max(16px, 3vw) 18px; align-items: end;
+  }
+  .caption .artist { font-weight: 500; }
+  .caption .meta { color: var(--mute); }
+  .counter { font-variant-numeric: tabular-nums; color: var(--mute); }
+  .counter b { color: var(--ink); font-weight: 400; }
+  .links { display: flex; gap: 14px; justify-content: flex-end; flex-wrap: wrap; }
+  .links a { color: var(--mute); }
+  .links a:hover { color: var(--ink); }
+
+  .thumbs { display: flex; gap: 4px; padding: 0 max(16px, 3vw) 22px; overflow-x: auto; scrollbar-width: none; justify-content: center; }
+  .thumbs button { flex: 0 0 22px; height: 22px; opacity: .3; transition: opacity .2s, transform .2s; }
+  .thumbs button:hover { opacity: .7; }
+  .thumbs button[aria-current="true"] { opacity: 1; transform: translateY(-3px); }
+  .thumbs img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  @media (max-width: 700px) {
+    .caption { grid-template-columns: minmax(0, 1fr) auto; }
+    .links { grid-column: 1 / -1; justify-content: flex-start; }
+    .thumbs { justify-content: flex-start; }
+  }
+  @media (prefers-reduced-motion: reduce) { .track { scroll-behavior: auto; } .thumbs button { transition: none; } }
+</style>
+</head>
+<body>
+  <div class="bar">
+    <span>adam lilienfeldt</span>
+    <nav>
+      <button data-view="music" aria-pressed="true">music</button>
+      <button data-view="film" aria-pressed="false">film</button>
+    </nav>
+    <a href="mailto:lilienfeldt.adam@gmail.com">lilienfeldt.adam@gmail.com</a>
+  </div>
+
+  <div class="track" id="track" tabindex="0" aria-label="Releases, use arrow keys"></div>
+
+  <div class="caption" aria-live="polite">
+    <div>
+      <p class="artist" id="artist"></p>
+      <p id="title"></p>
+      <p class="meta" id="meta"></p>
+    </div>
+    <p class="counter" id="counter"></p>
+    <div class="links" id="links"></div>
+  </div>
+
+  <div class="thumbs" id="thumbs"></div>
+
+<script src="data.js"></script>
+<script>
+  const SERVICE_LABELS = { spotify: 'spotify', appleMusic: 'apple music', tidal: 'tidal', youtubeMusic: 'youtube music', youtube: 'youtube' };
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+  const $ = (id) => document.getElementById(id);
+  const track = $('track'), thumbs = $('thumbs');
+  let view = 'music', items = [], current = -1;
+
+  function links(r) {
+    const s = Object.entries(SERVICE_LABELS).filter(([k]) => r.services[k])
+      .map(([k, l]) => `<a href="${esc(r.services[k])}" target="_blank" rel="noopener">${l} ↗</a>`);
+    if (!s.length && r.link) s.push(`<a href="${esc(r.link)}" target="_blank" rel="noopener">${view === 'film' ? 'watch' : 'listen'} ↗</a>`);
+    return s.join('');
+  }
+
+  function show(i) {
+    if (i === current) return;
+    current = i;
+    const r = items[i];
+    $('artist').textContent = r.artist;
+    $('title').textContent = r.title;
+    $('meta').textContent = [r.credits, r.label].filter(Boolean).join(' — ');
+    $('counter').innerHTML = `<b>${String(i + 1).padStart(2, '0')}</b> / ${String(items.length).padStart(2, '0')}`;
+    $('links').innerHTML = links(r);
+    thumbs.querySelectorAll('button').forEach((b, j) => b.setAttribute('aria-current', j === i));
+    thumbs.children[i].scrollIntoView({ inline: 'nearest', block: 'nearest' });
+  }
+
+  function go(i) {
+    i = Math.max(0, Math.min(items.length - 1, i));
+    track.scrollTo({ left: i * track.clientWidth });
+    show(i);
+  }
+
+  function render() {
+    items = DATA[view];
+    current = -1;
+    track.innerHTML = items.map((r) => `<div class="slide"><img src="${esc(r.cover)}" alt="${esc(r.title)} by ${esc(r.artist)}"></div>`).join('');
+    thumbs.innerHTML = items.map((r, i) => `<button data-i="${i}" aria-label="${esc(r.artist)}, ${esc(r.title)}"><img src="${esc(r.cover)}" alt="" loading="lazy"></button>`).join('');
+    track.scrollLeft = 0;
+    show(0);
+  }
+
+  // Swipe / trackpad: native scroll-snap; caption follows the snapped slide.
+  track.addEventListener('scroll', () => show(Math.round(track.scrollLeft / track.clientWidth)));
+  // Click left/right half of the cover to step.
+  track.addEventListener('click', (e) => go(current + (e.clientX < innerWidth / 2 ? -1 : 1)));
+  // Vertical wheel steps one release at a time.
+  let wheelLock = false;
+  track.addEventListener('wheel', (e) => {
+    if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+    e.preventDefault();
+    if (wheelLock) return;
+    wheelLock = true; setTimeout(() => (wheelLock = false), 450);
+    go(current + Math.sign(e.deltaY));
+  }, { passive: false });
+  addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') go(current + 1);
+    if (e.key === 'ArrowLeft') go(current - 1);
+  });
+  thumbs.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-i]');
+    if (b) go(+b.dataset.i);
+  });
+  document.querySelectorAll('[data-view]').forEach((b) => b.addEventListener('click', () => {
+    view = b.dataset.view;
+    document.querySelectorAll('[data-view]').forEach((x) => x.setAttribute('aria-pressed', x === b));
+    render();
+  }));
+
+  render();
+</script>
+</body>
+</html>

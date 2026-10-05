@@ -144,6 +144,8 @@ have a cover are skipped.
 
 ## Playlists (link-only pages)
 
+Easiest: `npm run admin` → **playlists** tab. Pick a playlist or "+ new playlist", paste Spotify song links under "+ add songs", drag to reorder, × to remove, then **save playlist**. Or from the terminal:
+
 ```
 npm run playlist:add -- <slug>                      # links from clipboard (Cmd+C in Spotify)
 npm run playlist:add -- <slug> <spotify-track-url> ...

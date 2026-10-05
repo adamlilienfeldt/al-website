@@ -4,6 +4,9 @@
 //
 //   npm run playlist:add -- <slug> <spotify-track-url> [<spotify-track-url> ...]
 //
+// Without links it reads them from the clipboard (macOS), so you can select
+// tracks in the Spotify app, press Cmd+C and run `npm run playlist:add -- <slug>`.
+//
 // Writes src/data/playlists/<slug>.json and downloads covers to
 // src/assets/playlists/, so the site build never calls an external API.
 // Re-running with the same slug keeps the title, description and
@@ -11,6 +14,7 @@
 
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { fileURLToPath } from 'url';
+import { execSync } from 'child_process';
 import { dirname, join } from 'path';
 import { fetchOdesli, fetchAppleMusic, downloadImage, sleep } from './fetch-covers.js';
 
@@ -18,10 +22,14 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = join(__dirname, 'src/data/playlists');
 const COVERS_DIR = join(__dirname, 'src/assets/playlists');
 
-const [slug, ...urls] = process.argv.slice(2);
+const [slug, ...args] = process.argv.slice(2);
+// One link per line (Spotify's Cmd+C) or space separated, from args or clipboard.
+const input = args.length ? args.join(' ') : execSync('pbpaste', { encoding: 'utf-8' });
+const urls = input.split(/\s+/).filter(Boolean);
 if (!slug || !/^[a-z0-9-]+$/.test(slug) || urls.length === 0) {
-  console.error('usage: npm run playlist:add -- <slug> <spotify-track-url> [...]');
+  console.error('usage: npm run playlist:add -- <slug> [<spotify-track-url> ...]');
   console.error('slug: lowercase letters, digits and dashes');
+  console.error('no links given: copy tracks in Spotify (Cmd+C) first');
   process.exit(1);
 }
 

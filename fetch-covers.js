@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { readFileSync, writeFileSync, existsSync } from 'fs';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import { dirname, join, basename } from 'path';
 import sharp from 'sharp';
 import { slugify } from './lib/slug.js';
@@ -34,7 +34,7 @@ const PLATFORMS = [
   ['tidal', 'tidal'],
 ];
 
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // Recursively find the first object key in a parsed JSON tree.
 function deepFind(obj, key) {
@@ -92,7 +92,7 @@ function matchApple(results, artist, title) {
   return null;
 }
 
-async function fetchAppleMusic(artist, title, type) {
+export async function fetchAppleMusic(artist, title, type) {
   // EPs and albums are collections on Apple; only true singles are 'song'.
   const entity = type === 'single' ? 'song' : 'album';
   // Try the full title, then the part before a "/" (split-single titles).
@@ -129,7 +129,7 @@ async function appleArtwork(appleUrl, title) {
 // embeds the full link set (incl. YouTube/Apple) in __NEXT_DATA__ and isn't
 // subject to the API's aggressive 429 throttle — it also resolves Odesli's own
 // shortlinks, which the API rejects with 400.
-async function fetchOdesli(link) {
+export async function fetchOdesli(link) {
   // Odesli's own short pages (song.link/album.link) embed __NEXT_DATA__
   // directly. A raw Spotify track/album URL is mapped to the equivalent
   // song.link /s/ (or album.link) page, which carries the same data.
@@ -166,16 +166,22 @@ async function fetchOdesli(link) {
     if (byPlatform[odesliKey]) services[ourKey] = byPlatform[odesliKey];
   }
 
-  // Thumbnail lives on the first (header) section.
-  const thumbnailUrl = sections.find((s) => s?.thumbnailUrl)?.thumbnailUrl;
+  // Thumbnail, title and artist live on the first (header) section.
+  const header = sections.find((s) => s?.thumbnailUrl) || {};
 
-  return { thumbnailUrl, services };
+  return {
+    thumbnailUrl: header.thumbnailUrl,
+    title: header.title,
+    artistName: header.artistName,
+    pageUrl: pageData?.pageUrl,
+    services,
+  };
 }
 
 // Download, cap at maxEdge and save as JPEG. With onlyIfLarger, keep the file
 // already on disk unless the new image is wider (so a refresh never downgrades
 // a hand-picked or bigger cover). Returns whether it wrote the file.
-async function downloadImage(imageUrl, destPath, maxEdge = MAX_EDGE, { onlyIfLarger = false } = {}) {
+export async function downloadImage(imageUrl, destPath, maxEdge = MAX_EDGE, { onlyIfLarger = false } = {}) {
   const res = await fetch(imageUrl);
   if (!res.ok) throw new Error(`Failed to download ${imageUrl}`);
   const input = Buffer.from(await res.arrayBuffer());
@@ -339,4 +345,5 @@ async function main() {
   await fetchFilmPosters();
 }
 
-main();
+// Run only as a script; add-playlist.js imports the helpers above.
+if (import.meta.url === pathToFileURL(process.argv[1]).href) main();

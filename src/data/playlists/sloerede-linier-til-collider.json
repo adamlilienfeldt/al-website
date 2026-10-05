@@ -1,0 +1,102 @@
+{
+  "title": "Slørede Linier til Collider",
+  "description": "",
+  "spotifyPlaylistUrl": "",
+  "tracks": [
+    {
+      "title": "Alt I dig",
+      "artist": "Slørede Linier",
+      "duration": 334,
+      "cover": "1SDf2RUFfc95UXtnyruCgG.jpg",
+      "songLink": "https://song.link/s/1SDf2RUFfc95UXtnyruCgG",
+      "services": {
+        "spotify": "https://open.spotify.com/track/1SDf2RUFfc95UXtnyruCgG",
+        "tidal": "https://listen.tidal.com/track/363362789",
+        "appleMusic": "https://music.apple.com/us/album/alt-i-dig/1746534409?i=1746535682"
+      }
+    },
+    {
+      "title": "BIGSHOT (Tredjeperson x IVER)",
+      "artist": "Tredjeperson, IVER",
+      "duration": 192,
+      "cover": "4h66JnDMBKKh3zFy7QM36A.jpg",
+      "songLink": "https://song.link/s/4h66JnDMBKKh3zFy7QM36A",
+      "services": {
+        "spotify": "https://open.spotify.com/track/4h66JnDMBKKh3zFy7QM36A",
+        "tidal": "https://listen.tidal.com/track/472402819"
+      }
+    },
+    {
+      "title": "INDIGO",
+      "artist": "Elvira Alfaro",
+      "duration": 220,
+      "cover": "7FmNrIXnaE018tLQklj6lB.jpg",
+      "songLink": "https://song.link/s/7FmNrIXnaE018tLQklj6lB",
+      "services": {
+        "spotify": "https://open.spotify.com/track/7FmNrIXnaE018tLQklj6lB",
+        "tidal": "https://listen.tidal.com/track/293143341",
+        "appleMusic": "https://music.apple.com/us/album/indigo/1686547548?i=1686547557"
+      }
+    },
+    {
+      "title": "Love You Baby All the Time",
+      "artist": "Kindsight",
+      "duration": 230,
+      "cover": "1Lei9q7YSBFujd5zRCejM0.jpg",
+      "songLink": "https://song.link/s/1Lei9q7YSBFujd5zRCejM0",
+      "services": {
+        "spotify": "https://open.spotify.com/track/1Lei9q7YSBFujd5zRCejM0",
+        "tidal": "https://listen.tidal.com/track/244161190",
+        "appleMusic": "https://music.apple.com/us/album/love-you-baby-all-the-time/1785768775?i=1785768780"
+      }
+    },
+    {
+      "title": "Sun Is Always in My Eyes",
+      "artist": "Kindsight",
+      "duration": 213,
+      "cover": "4QWTyi5sSMlBrH1PncNccg.jpg",
+      "songLink": "https://song.link/s/4QWTyi5sSMlBrH1PncNccg",
+      "services": {
+        "spotify": "https://open.spotify.com/track/4QWTyi5sSMlBrH1PncNccg",
+        "tidal": "https://listen.tidal.com/track/202657647",
+        "appleMusic": "https://music.apple.com/us/album/sun-is-always-in-my-eyes/1785733181?i=1785733428"
+      }
+    },
+    {
+      "title": "Tiger girl, where are you?",
+      "artist": "Nooooooo, Thurston Moore",
+      "duration": 40,
+      "cover": "1TwYtGVKNzLt81cXH9lsbz.jpg",
+      "songLink": "https://song.link/s/1TwYtGVKNzLt81cXH9lsbz",
+      "services": {
+        "spotify": "https://open.spotify.com/track/1TwYtGVKNzLt81cXH9lsbz",
+        "tidal": "https://listen.tidal.com/track/137898629",
+        "appleMusic": "https://music.apple.com/us/album/tiger-girl-where-are-you-feat-thurston-moore/1508544958?i=1508545219"
+      }
+    },
+    {
+      "title": "Lion + Goat + Snake",
+      "artist": "Nooooooo, Thurston Moore",
+      "duration": 228,
+      "cover": "6viVU23siIi7eSXysUHq0P.jpg",
+      "songLink": "https://song.link/s/6viVU23siIi7eSXysUHq0P",
+      "services": {
+        "spotify": "https://open.spotify.com/track/6viVU23siIi7eSXysUHq0P",
+        "tidal": "https://listen.tidal.com/track/137898630",
+        "appleMusic": "https://music.apple.com/us/album/lion-goat-snake-feat-thurston-moore/1508544958?i=1508545223"
+      }
+    },
+    {
+      "title": "Spiraling",
+      "artist": "Collider",
+      "duration": 282,
+      "cover": "3jLEwd0KfQ4AAaA8SnIybF.jpg",
+      "songLink": "https://song.link/s/3jLEwd0KfQ4AAaA8SnIybF",
+      "services": {
+        "spotify": "https://open.spotify.com/track/3jLEwd0KfQ4AAaA8SnIybF",
+        "tidal": "https://listen.tidal.com/track/363239787",
+        "appleMusic": "https://music.apple.com/us/album/spiraling/1746396560?i=1746396567"
+      }
+    }
+  ]
+}

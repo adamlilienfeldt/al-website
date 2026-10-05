@@ -55,6 +55,8 @@ const coverSrc = cover;
 </div>
 
 <script>
+  import { SERVICES, musicAppUrl } from '../lib/services';
+
   function initCards() {
     const cards = document.querySelectorAll<HTMLElement>('.card');
 
@@ -75,32 +77,6 @@ const coverSrc = cover;
 
     const servicesEl = modal.querySelector('.odesli-services') as HTMLElement;
     const closeBtn = modal.querySelector('.odesli-modal-close') as HTMLElement;
-
-    // Brand icon (inline SVG, currentColor) + label per service key.
-    // Order here = listing order in the picker.
-    const SERVICES: Record<string, { label: string; icon: string }> = {
-      spotify: {
-        label: 'Spotify',
-        icon: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.5 17.32a.75.75 0 01-1.03.25c-2.82-1.72-6.36-2.11-10.54-1.16a.75.75 0 11-.33-1.46c4.57-1.04 8.49-.59 11.65 1.34.35.22.46.68.25 1.03zm1.47-3.27a.94.94 0 01-1.29.31c-3.23-1.98-8.15-2.56-11.97-1.4a.94.94 0 11-.54-1.8c4.37-1.32 9.79-.67 13.5 1.6.44.27.58.85.3 1.29zm.13-3.4C15.32 8.4 8.74 8.18 4.98 9.32a1.13 1.13 0 11-.65-2.16c4.32-1.31 11.58-1.06 16.15 1.65a1.13 1.13 0 01-1.15 1.94z"/></svg>',
-      },
-      appleMusic: {
-        label: 'Apple Music',
-        // Official Apple Music mark (simple-icons): rounded square + note.
-        icon: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.997 6.124a9.23 9.23 0 0 0-.24-2.19c-.317-1.31-1.062-2.31-2.18-3.043a5.022 5.022 0 0 0-1.877-.726 10.496 10.496 0 0 0-1.564-.15c-.04-.003-.083-.01-.124-.013H5.988c-.152.01-.303.017-.455.026-.747.043-1.49.123-2.193.4-1.336.53-2.3 1.452-2.865 2.78-.192.448-.292.925-.363 1.408-.056.392-.088.785-.1 1.18 0 .032-.007.062-.01.093v12.223c.01.14.017.283.027.424.05.815.154 1.624.497 2.373.65 1.42 1.738 2.353 3.234 2.801.42.127.856.187 1.293.228.555.053 1.11.06 1.667.06h11.03a12.5 12.5 0 0 0 1.57-.1c.822-.106 1.596-.35 2.295-.81a5.046 5.046 0 0 0 1.88-2.207c.186-.42.293-.87.37-1.324.113-.675.138-1.358.137-2.04-.002-3.8 0-7.595-.003-11.393zm-6.423 3.99v5.712c0 .417-.058.827-.244 1.206-.29.59-.76.962-1.388 1.14-.35.1-.706.157-1.07.173-.95.045-1.773-.6-1.943-1.536-.142-.773.227-1.624 1.038-2.022.32-.157.66-.252 1.01-.32.378-.075.755-.144 1.128-.243.183-.047.37-.11.512-.24.18-.166.272-.388.305-.62.04-.27.06-.55.06-.83V8.91c0-.18-.04-.348-.13-.504a.683.683 0 0 0-.45-.328c-.244-.06-.494-.078-.745-.062-.224.014-.448.052-.668.107l-3.69.74c-.244.05-.486.106-.728.165-.357.087-.6.32-.706.673-.06.205-.085.42-.085.633-.002 1.857 0 3.715 0 5.572 0 .417-.057.827-.243 1.206-.29.59-.76.96-1.39 1.137-.35.1-.705.157-1.067.174-.95.044-1.773-.6-1.944-1.537-.142-.77.228-1.622 1.038-2.02.32-.157.66-.25 1.01-.32.378-.076.755-.145 1.128-.245.183-.047.37-.11.513-.24.18-.165.273-.387.306-.62.04-.27.06-.55.06-.83V7.43c0-.21.02-.418.07-.62.116-.45.4-.74.85-.86.226-.06.46-.1.69-.146l4.85-.973c.235-.047.47-.094.71-.107.27-.015.54.005.79.13.27.135.43.37.5.66.05.21.07.42.07.633z"/></svg>',
-      },
-      youtubeMusic: {
-        label: 'YouTube Music',
-        icon: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm0 19.5c-4.14 0-7.5-3.36-7.5-7.5S7.86 4.5 12 4.5s7.5 3.36 7.5 7.5-3.36 7.5-7.5 7.5zM9.75 8.25v7.5L16 12l-6.25-3.75z"/></svg>',
-      },
-      youtube: {
-        label: 'YouTube',
-        icon: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3.02 3.02 0 00-2.12-2.14C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.38.51A3.02 3.02 0 00.5 6.2C0 8.07 0 12 0 12s0 3.93.5 5.8a3.02 3.02 0 002.12 2.14c1.88.51 9.38.51 9.38.51s7.5 0 9.38-.51a3.02 3.02 0 002.12-2.14C24 15.93 24 12 24 12s0-3.93-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z"/></svg>',
-      },
-      tidal: {
-        label: 'Tidal',
-        icon: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.012 3.992L8.008 7.996 4.004 3.992 0 7.996 4.004 12l4.004-4.004L12.012 12l-4.004 4.004 4.004 4.004 4.004-4.004L12.016 12l4.004-4.004 4.004 4.004L24 7.996l-4.004-4.004-4.004 4.004z"/></svg>',
-      },
-    };
 
     // Escape a value for safe interpolation into HTML attributes / text. The
     // service URLs and titles come from external APIs (Odesli / iTunes) via
@@ -181,18 +157,12 @@ const coverSrc = cover;
       if (cardData(card).has) openModal(card);
     }
 
-    // Mac: open Apple Music links in the Music app, which every Mac ships
-    // with. Elsewhere the https link is fine: phones open the app through
-    // universal links, and other computers may not have it.
-    const isMacDesktop =
-      /Macintosh|Mac OS X/.test(navigator.userAgent) &&
-      window.matchMedia('(hover: hover) and (pointer: fine)').matches;
     servicesEl.addEventListener('click', (e) => {
       const a = (e.target as Element).closest<HTMLAnchorElement>('a[data-service="appleMusic"]');
-      const m = a?.href.match(/^https:\/\/(?:geo\.)?music\.apple\.com(\/.*)$/);
-      if (!isMacDesktop || !m) return;
+      const app = a && musicAppUrl(a.href);
+      if (!app) return;
       e.preventDefault();
-      window.location.href = `music://music.apple.com${m[1]}`;
+      window.location.href = app;
     });
 
     closeBtn.addEventListener('click', closeModal);

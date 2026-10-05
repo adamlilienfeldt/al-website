@@ -141,3 +141,11 @@ have a cover are skipped.
   `fetch-covers.js`), so its covers feed the build correctly. It does **not**
   set `services` — after adding a release in admin, still run
   `npm run fetch-covers` to pull the streaming links.
+
+## Playlists (link-only pages)
+
+```
+npm run playlist:add -- <slug> <spotify-track-url> [<spotify-track-url> ...]
+```
+
+Creates `src/data/playlists/<slug>.json` and covers in `src/assets/playlists/`, served at `/playlists/<slug>`. Edit `title`, `description` and (once the playlist is public) `spotifyPlaylistUrl` in the json, then commit. Re-running with the same slug rebuilds the track list and keeps those fields. Playlist pages are `noindex`, not in the nav and not in the sitemap. Tracks missing on Apple Music or Tidal link to their song.link page.

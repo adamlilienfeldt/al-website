@@ -8,7 +8,8 @@
     "preview": "astro preview",
     "admin": "node admin.js",
     "fetch-covers": "node fetch-covers.js",
-    "check": "astro check"
+    "check": "astro check",
+    "playlist:add": "node add-playlist.js"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.6",

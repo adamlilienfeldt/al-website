@@ -704,3 +704,133 @@ footer {
   border-color: var(--text-secondary);
   transform: none;
 }
+
+/* ─── Playlist page ──────────────────────────────────── */
+
+.playlist-hero h1 {
+  font-weight: 100;
+}
+
+.playlist {
+  max-width: 720px;
+  padding: 0 var(--page-pad);
+}
+
+/* Service picker: the popup's icons, dimmed until chosen. */
+.playlist-picker {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.playlist-picker .odesli-service {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  opacity: 0.5;
+}
+
+.playlist-picker .odesli-service[aria-pressed="true"] {
+  color: var(--text);
+  opacity: 1;
+}
+
+.playlist-picker .odesli-service:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 4px;
+  border-radius: 50%;
+}
+
+.playlist-full {
+  display: inline-block;
+  margin-bottom: 20px;
+  color: var(--text-secondary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.playlist-full:hover {
+  color: var(--text);
+}
+
+.playlist-tracks {
+  list-style: none;
+  border-top: 1px solid var(--rule);
+}
+
+.playlist-tracks li {
+  border-bottom: 1px solid var(--rule);
+}
+
+.playlist-track {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 0;
+  transition: opacity 0.15s;
+}
+
+@media (hover: hover) {
+  .playlist-track:hover {
+    opacity: 0.6;
+  }
+}
+
+.playlist-num,
+.playlist-duration {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.playlist-num {
+  width: 1.6em;
+  text-align: right;
+}
+
+.playlist-cover {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  object-fit: cover;
+  background: var(--placeholder);
+}
+
+.playlist-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.playlist-title,
+.playlist-artist {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playlist-title {
+  font-weight: 300;
+}
+
+.playlist-artist {
+  color: var(--text-secondary);
+}
+
+/* Shown when the chosen service doesn't have the track. */
+.playlist-fallback {
+  display: none;
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.playlist-track.is-fallback .playlist-fallback {
+  display: inline;
+}

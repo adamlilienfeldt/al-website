@@ -1,43 +1,8 @@
 {
-  "title": "Slørede Linier til Collider",
+  "title": "Rock-sager",
   "description": "",
   "spotifyPlaylistUrl": "",
   "tracks": [
-    {
-      "title": "Alt I dig",
-      "artist": "Slørede Linier",
-      "duration": 334,
-      "cover": "1SDf2RUFfc95UXtnyruCgG.jpg",
-      "songLink": "https://song.link/s/1SDf2RUFfc95UXtnyruCgG",
-      "services": {
-        "spotify": "https://open.spotify.com/track/1SDf2RUFfc95UXtnyruCgG",
-        "tidal": "https://listen.tidal.com/track/363362789",
-        "appleMusic": "https://music.apple.com/us/album/alt-i-dig/1746534409?i=1746535682"
-      }
-    },
-    {
-      "title": "BIGSHOT (Tredjeperson x IVER)",
-      "artist": "Tredjeperson, IVER",
-      "duration": 192,
-      "cover": "4h66JnDMBKKh3zFy7QM36A.jpg",
-      "songLink": "https://song.link/s/4h66JnDMBKKh3zFy7QM36A",
-      "services": {
-        "spotify": "https://open.spotify.com/track/4h66JnDMBKKh3zFy7QM36A",
-        "tidal": "https://listen.tidal.com/track/472402819"
-      }
-    },
-    {
-      "title": "INDIGO",
-      "artist": "Elvira Alfaro",
-      "duration": 220,
-      "cover": "7FmNrIXnaE018tLQklj6lB.jpg",
-      "songLink": "https://song.link/s/7FmNrIXnaE018tLQklj6lB",
-      "services": {
-        "spotify": "https://open.spotify.com/track/7FmNrIXnaE018tLQklj6lB",
-        "tidal": "https://listen.tidal.com/track/293143341",
-        "appleMusic": "https://music.apple.com/us/album/indigo/1686547548?i=1686547557"
-      }
-    },
     {
       "title": "Love You Baby All the Time",
       "artist": "Kindsight",
@@ -60,6 +25,42 @@
         "spotify": "https://open.spotify.com/track/4QWTyi5sSMlBrH1PncNccg",
         "tidal": "https://listen.tidal.com/track/202657647",
         "appleMusic": "https://music.apple.com/us/album/sun-is-always-in-my-eyes/1785733181?i=1785733428"
+      }
+    },
+    {
+      "title": "Spiraling",
+      "artist": "Collider",
+      "duration": 282,
+      "cover": "3jLEwd0KfQ4AAaA8SnIybF.jpg",
+      "songLink": "https://song.link/s/3jLEwd0KfQ4AAaA8SnIybF",
+      "services": {
+        "spotify": "https://open.spotify.com/track/3jLEwd0KfQ4AAaA8SnIybF",
+        "tidal": "https://listen.tidal.com/track/363239787",
+        "appleMusic": "https://music.apple.com/us/album/spiraling/1746396560?i=1746396567"
+      }
+    },
+    {
+      "title": "Alt I dig",
+      "artist": "Slørede Linier",
+      "duration": 334,
+      "cover": "1SDf2RUFfc95UXtnyruCgG.jpg",
+      "songLink": "https://song.link/s/1SDf2RUFfc95UXtnyruCgG",
+      "services": {
+        "spotify": "https://open.spotify.com/track/1SDf2RUFfc95UXtnyruCgG",
+        "tidal": "https://listen.tidal.com/track/363362789",
+        "appleMusic": "https://music.apple.com/us/album/alt-i-dig/1746534409?i=1746535682"
+      }
+    },
+    {
+      "title": "INDIGO",
+      "artist": "Elvira Alfaro",
+      "duration": 220,
+      "cover": "7FmNrIXnaE018tLQklj6lB.jpg",
+      "songLink": "https://song.link/s/7FmNrIXnaE018tLQklj6lB",
+      "services": {
+        "spotify": "https://open.spotify.com/track/7FmNrIXnaE018tLQklj6lB",
+        "tidal": "https://listen.tidal.com/track/293143341",
+        "appleMusic": "https://music.apple.com/us/album/indigo/1686547548?i=1686547557"
       }
     },
     {
@@ -87,15 +88,14 @@
       }
     },
     {
-      "title": "Spiraling",
-      "artist": "Collider",
-      "duration": 282,
-      "cover": "3jLEwd0KfQ4AAaA8SnIybF.jpg",
-      "songLink": "https://song.link/s/3jLEwd0KfQ4AAaA8SnIybF",
+      "title": "BIGSHOT (Tredjeperson x IVER)",
+      "artist": "Tredjeperson, IVER",
+      "duration": 192,
+      "cover": "4h66JnDMBKKh3zFy7QM36A.jpg",
+      "songLink": "https://song.link/s/4h66JnDMBKKh3zFy7QM36A",
       "services": {
-        "spotify": "https://open.spotify.com/track/3jLEwd0KfQ4AAaA8SnIybF",
-        "tidal": "https://listen.tidal.com/track/363239787",
-        "appleMusic": "https://music.apple.com/us/album/spiraling/1746396560?i=1746396567"
+        "spotify": "https://open.spotify.com/track/4h66JnDMBKKh3zFy7QM36A",
+        "tidal": "https://listen.tidal.com/track/472402819"
       }
     }
   ]

@@ -330,7 +330,7 @@ function getHTML(releases, films, playlists) {
   </div>
 
   <script type="application/json" id="pl-data">${JSON.stringify(playlists).replace(/</g, '\\u003c')}</script>
-  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.7/Sortable.min.js"></script>
   <script>
     // ─── Tabs ────────────────────────────────────────────────
     function switchTab(name) {

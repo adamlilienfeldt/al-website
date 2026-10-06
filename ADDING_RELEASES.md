@@ -158,3 +158,13 @@ Creates `src/data/playlists/<slug>.json` and covers in `src/assets/playlists/`, 
 Install once: `npm run admin:app` puts **Site Admin.app** in /Applications. Open it to start the admin console in your browser; quit it (Cmd+Q) to stop it. Rebuild with the same command if the repo or Node moves.
 
 The **publish** button (top right) lists the saved changes and asks before publishing. It commits only `src/data/` and `src/assets/`, pushes `main`, and the site updates about 2 minutes later. It only works on the `main` branch. If GitHub is unreachable or has clashing changes, nothing is lost: the changes stay on this computer.
+
+### On another Mac
+
+Paste into Terminal once:
+
+```
+bash <(curl -fsSL https://raw.githubusercontent.com/adamlilienfeldt/al-website/main/install-admin.sh)
+```
+
+It installs what's missing (git, Node, GitHub login), downloads the site to `~/Code/DEV/al-website`, checks publishing works and installs **Site Admin.app**. Each Mac has its own copy: before editing on one Mac, nothing extra is needed (the publish button pulls the other Mac's changes first), but publish when you're done so the other Mac sees your changes.

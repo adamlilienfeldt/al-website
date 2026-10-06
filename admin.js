@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import sharp from 'sharp';
 import { slugify } from './lib/slug.js';
 import { sleep } from './fetch-covers.js';
+import { renderIcon } from './admin-icon.js';
 import { PLAYLIST_COVERS_DIR, SLUG_RE, parseTrackIds, resolveTrack, listPlaylists, writePlaylist, deletePlaylist } from './add-playlist.js';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
@@ -112,7 +113,8 @@ function getHTML(releases, films, playlists) {
 <html>
 <head>
   <meta charset="utf-8">
-  <title>admin — adam lilienfeldt</title>
+  <title>al site admin</title>
+  <link rel="icon" type="image/png" href="/icon.png">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: "Helvetica Neue", Helvetica, sans-serif; font-weight: 100; color: #111; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
@@ -738,6 +740,12 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  if (req.method === 'GET' && req.url === '/icon.png') {
+    res.writeHead(200, { 'Content-Type': 'image/png', 'Cache-Control': 'max-age=86400' });
+    res.end(await renderIcon(64));
+    return;
+  }
+
   if (req.method === 'GET' && req.url.startsWith('/images/')) {
     const name = path.basename(req.url);
     const ext = path.extname(name);
@@ -928,7 +936,7 @@ const server = http.createServer(async (req, res) => {
 });
 
 // Start from the latest published content, so a second Mac doesn't edit a
-// stale copy. Short timeout: Site Admin.app gives up if the page isn't up
+// stale copy. Short timeout: AL Site Admin.app gives up if the page isn't up
 // within ~10s, and offline should just mean "use what's here".
 try {
   await execFileP('git', ['pull', '--ff-only', '--autostash'], { cwd: __dir, timeout: 6000 });

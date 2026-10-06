@@ -1,5 +1,5 @@
 #!/bin/bash
-# Build "Site Admin.app" — a double-clickable launcher for the admin console.
+# Build "AL Site Admin.app" — a double-clickable launcher for the admin console.
 #
 # The app starts admin.js in the background (unless something already listens
 # on port 3001), opens http://localhost:3001 in your normal browser, and stops
@@ -7,12 +7,13 @@
 # icon reopens the page.  Server output goes to ~/Library/Logs/site-admin.log.
 # The repo path and node path are baked in, so rebuild if either moves.
 #
-#   ./build-admin-app.sh              # build build/Site Admin.app
+#   ./build-admin-app.sh              # build build/AL Site Admin.app
 #   ./build-admin-app.sh --install    # …and copy it to /Applications
 set -e
 
 REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
-APP_NAME="Site Admin"
+APP_NAME="AL Site Admin"
+OLD_APP_NAME="Site Admin"   # name before 2026-10; removed on --install
 
 NODE_PATH="$(command -v node || true)"
 if [ -z "$NODE_PATH" ]; then
@@ -79,14 +80,22 @@ APP="$TMP_DIR/$APP_NAME.app"
 osacompile -s -o "$APP" "$TMP_DIR/main.applescript"
 /usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier com.adamlilienfeldt.site-admin" "$APP/Contents/Info.plist" 2>/dev/null \
     || /usr/libexec/PlistBuddy -c "Add :CFBundleIdentifier string com.adamlilienfeldt.site-admin" "$APP/Contents/Info.plist"
+# Our icon (admin-icon.js) instead of the default script icon. Assets.car and
+# CFBundleIconName take priority over applet.icns on current macOS, so drop them.
+node "$REPO_DIR/admin-icon.js" "$TMP_DIR/AppIcon.iconset"
+iconutil -c icns -o "$APP/Contents/Resources/applet.icns" "$TMP_DIR/AppIcon.iconset"
+rm -f "$APP/Contents/Resources/Assets.car"
+/usr/libexec/PlistBuddy -c "Delete :CFBundleIconName" "$APP/Contents/Info.plist" 2>/dev/null || true
 codesign --force --sign - "$APP" 2>/dev/null || true   # Info.plist edit invalidates the signature
 
 if [ "$1" = "--install" ]; then
-    if pgrep -f "/$APP_NAME.app/Contents/MacOS/" >/dev/null; then
-        echo "error: $APP_NAME is running — quit it (Cmd+Q) and run this again." >&2
-        exit 1
-    fi
-    rm -rf "/Applications/$APP_NAME.app"
+    for name in "$APP_NAME" "$OLD_APP_NAME"; do
+        if pgrep -f "/$name.app/Contents/MacOS/" >/dev/null; then
+            echo "error: $name is running — quit it (Cmd+Q) and run this again." >&2
+            exit 1
+        fi
+    done
+    rm -rf "/Applications/$APP_NAME.app" "/Applications/$OLD_APP_NAME.app"
     ditto "$APP" "/Applications/$APP_NAME.app"
     echo "Installed /Applications/$APP_NAME.app"
 else

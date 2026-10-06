@@ -1,11 +1,11 @@
 #!/bin/bash
-# One-time setup of Site Admin on another Mac. Paste into Terminal:
+# One-time setup of AL Site Admin on another Mac. Paste into Terminal:
 #
 #   bash <(curl -fsSL https://raw.githubusercontent.com/adamlilienfeldt/al-website/main/install-admin.sh)
 #
 # It installs what's missing (git, Node, GitHub login), downloads the site to
 # ~/Code/DEV/al-website (set AL_WEBSITE_DIR to use another folder), checks
-# that publishing to GitHub will work, and puts Site Admin.app in
+# that publishing to GitHub will work, and puts AL Site Admin.app in
 # /Applications. Safe to run again; it skips what's already done.
 set -e
 
@@ -54,7 +54,7 @@ if ! git push --dry-run origin main >/dev/null 2>&1; then
 fi
 echo "publishing works"
 
-step "Installing Site Admin.app"
+step "Installing AL Site Admin.app"
 ./build-admin-app.sh --install
 
-printf '\nDone. Open Site Admin from Applications (or Spotlight: "Site Admin").\n'
+printf '\nDone. Open AL Site Admin from Applications (or Spotlight: "AL Site Admin").\n'

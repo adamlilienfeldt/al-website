@@ -153,9 +153,9 @@ npm run playlist:add -- <slug> <spotify-track-url> ...
 
 Creates `src/data/playlists/<slug>.json` and covers in `src/assets/playlists/`, served at `/playlists/<slug>`. Edit `title`, `description` and (once the playlist is public) `spotifyPlaylistUrl` in the json, then commit. Re-running with the same slug rebuilds the track list and keeps those fields. Playlist pages are `noindex`, not in the nav and not in the sitemap. Tracks missing on Apple Music or Tidal link to their song.link page.
 
-## Site Admin app (no terminal)
+## AL Site Admin app (no terminal)
 
-Install once: `npm run admin:app` puts **Site Admin.app** in /Applications. Open it to start the admin console in your browser; quit it (Cmd+Q) to stop it. Rebuild with the same command if the repo or Node moves.
+Install once: `npm run admin:app` puts **AL Site Admin.app** in /Applications. Open it to start the admin console in your browser; quit it (Cmd+Q) to stop it. Rebuild with the same command if the repo or Node moves.
 
 The **publish** button (top right) lists the saved changes and asks before publishing. It commits only `src/data/` and `src/assets/`, pushes `main`, and the site updates about 2 minutes later. It only works on the `main` branch. If GitHub is unreachable or has clashing changes, nothing is lost: the changes stay on this computer.
 
@@ -167,4 +167,4 @@ Paste into Terminal once:
 bash <(curl -fsSL https://raw.githubusercontent.com/adamlilienfeldt/al-website/main/install-admin.sh)
 ```
 
-It installs what's missing (git, Node, GitHub login), downloads the site to `~/Code/DEV/al-website`, checks publishing works and installs **Site Admin.app**. Each Mac has its own copy. Site Admin fetches the latest from GitHub when it starts, so publish when you're done on one Mac and the other picks it up next time it opens Site Admin.
+It installs what's missing (git, Node, GitHub login), downloads the site to `~/Code/DEV/al-website`, checks publishing works and installs **AL Site Admin.app**. Each Mac has its own copy. AL Site Admin fetches the latest from GitHub when it starts, so publish when you're done on one Mac and the other picks it up next time it opens AL Site Admin.

@@ -927,6 +927,16 @@ const server = http.createServer(async (req, res) => {
   res.writeHead(404); res.end();
 });
 
+// Start from the latest published content, so a second Mac doesn't edit a
+// stale copy. Short timeout: Site Admin.app gives up if the page isn't up
+// within ~10s, and offline should just mean "use what's here".
+try {
+  await execFileP('git', ['pull', '--ff-only', '--autostash'], { cwd: __dir, timeout: 6000 });
+  console.log('up to date with github');
+} catch (e) {
+  console.log(`couldn't update from github, using local copy: ${e.stderr?.trim() || e.message}`);
+}
+
 // Localhost only: the admin can edit files and push to GitHub, so it must
 // not be reachable from other machines on the network.
 server.listen(PORT, '127.0.0.1', () => { console.log(`\nAdmin → http://localhost:${PORT}\n`); });

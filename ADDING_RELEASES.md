@@ -167,4 +167,4 @@ Paste into Terminal once:
 bash <(curl -fsSL https://raw.githubusercontent.com/adamlilienfeldt/al-website/main/install-admin.sh)
 ```
 
-It installs what's missing (git, Node, GitHub login), downloads the site to `~/Code/DEV/al-website`, checks publishing works and installs **Site Admin.app**. Each Mac has its own copy: before editing on one Mac, nothing extra is needed (the publish button pulls the other Mac's changes first), but publish when you're done so the other Mac sees your changes.
+It installs what's missing (git, Node, GitHub login), downloads the site to `~/Code/DEV/al-website`, checks publishing works and installs **Site Admin.app**. Each Mac has its own copy. Site Admin fetches the latest from GitHub when it starts, so publish when you're done on one Mac and the other picks it up next time it opens Site Admin.

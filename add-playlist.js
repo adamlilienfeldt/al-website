@@ -13,7 +13,7 @@
 // spotifyPlaylistUrl already in the file and rebuilds the track list.
 // The admin console (npm run admin) uses the helpers exported here.
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, unlinkSync } from 'fs';
 import { fileURLToPath, pathToFileURL } from 'url';
 import { execSync } from 'child_process';
 import { dirname, join } from 'path';
@@ -96,6 +96,11 @@ export function writePlaylist(slug, playlist) {
   if (!SLUG_RE.test(slug)) throw new Error(`bad slug: ${slug}`);
   mkdirSync(DATA_DIR, { recursive: true });
   writeFileSync(join(DATA_DIR, `${slug}.json`), JSON.stringify(playlist, null, 2) + '\n');
+}
+
+export function deletePlaylist(slug) {
+  if (!SLUG_RE.test(slug)) throw new Error(`bad slug: ${slug}`);
+  unlinkSync(join(DATA_DIR, `${slug}.json`));
 }
 
 async function main() {

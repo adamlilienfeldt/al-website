@@ -152,3 +152,9 @@ npm run playlist:add -- <slug> <spotify-track-url> ...
 ```
 
 Creates `src/data/playlists/<slug>.json` and covers in `src/assets/playlists/`, served at `/playlists/<slug>`. Edit `title`, `description` and (once the playlist is public) `spotifyPlaylistUrl` in the json, then commit. Re-running with the same slug rebuilds the track list and keeps those fields. Playlist pages are `noindex`, not in the nav and not in the sitemap. Tracks missing on Apple Music or Tidal link to their song.link page.
+
+## Site Admin app (no terminal)
+
+Install once: `npm run admin:app` puts **Site Admin.app** in /Applications. Open it to start the admin console in your browser; quit it (Cmd+Q) to stop it. Rebuild with the same command if the repo or Node moves.
+
+The **publish** button (top right) lists the saved changes and asks before publishing. It commits only `src/data/` and `src/assets/`, pushes `main`, and the site updates about 2 minutes later. It only works on the `main` branch. If GitHub is unreachable or has clashing changes, nothing is lost: the changes stay on this computer.

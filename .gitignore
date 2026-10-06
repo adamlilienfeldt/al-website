@@ -30,3 +30,6 @@ dist/
 !src/assets/**/*.jpg
 !src/assets/**/*.jpeg
 !src/assets/**/*.png
+
+# Site Admin.app build output (build-admin-app.sh)
+build/

@@ -1,11 +1,13 @@
 import http from 'http';
+import { execFile } from 'child_process';
+import { promisify } from 'util';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import sharp from 'sharp';
 import { slugify } from './lib/slug.js';
 import { sleep } from './fetch-covers.js';
-import { PLAYLIST_COVERS_DIR, SLUG_RE, parseTrackIds, resolveTrack, listPlaylists, readPlaylist, writePlaylist } from './add-playlist.js';
+import { PLAYLIST_COVERS_DIR, SLUG_RE, parseTrackIds, resolveTrack, listPlaylists, writePlaylist, deletePlaylist } from './add-playlist.js';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const MUSIC_JSON = path.join(__dir, 'src/data/music.json');
@@ -20,7 +22,7 @@ const MAX_EDGE   = 1400;
 // Film posters render up to a third of the page width, so keep more pixels.
 // Mirrors FILM_MAX_EDGE in fetch-covers.js.
 const FILM_MAX_EDGE = 1280;
-const PORT       = 3001;
+const PORT       = process.env.PORT || 3001;
 
 const MIME = { '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp' };
 
@@ -46,6 +48,28 @@ async function saveImage(cover, artist, title, maxEdge = MAX_EDGE) {
     .toBuffer();
   fs.writeFileSync(path.join(COVERS_DIR, filename), output);
   return `/images/${filename}`;
+}
+
+// Publishing commits only site content (data + covers), never code or stray
+// files, then pushes main; GitHub Actions deploys from there.
+const CONTENT = ['src/data', 'src/assets'];
+const execFileP = promisify(execFile);
+const git = async (...args) => (await execFileP('git', args, { cwd: __dir })).stdout.trimEnd(); // keep porcelain's leading space
+
+async function publishStatus() {
+  const branch = await git('rev-parse', '--abbrev-ref', 'HEAD');
+  const files = (await git('status', '--porcelain', '--untracked-files=all', '--', ...CONTENT))
+    .split('\n').filter(Boolean).map(l => l.slice(3));
+  // Commits saved locally but not yet pushed, e.g. after a failed publish.
+  const ahead = Number(await git('rev-list', '--count', '@{u}..HEAD').catch(() => '0'));
+  return { branch, files, ahead };
+}
+
+// "content: update music, playlists" from the changed paths.
+function commitMessage(files) {
+  const areas = new Set(files.map(f =>
+    f.includes('music.json') ? 'music' : f.includes('film.json') ? 'film' : f.includes('playlists') ? 'playlists' : 'covers'));
+  return `content: update ${[...areas].join(', ')}`;
 }
 
 function esc(s) { return String(s ?? '').replace(/"/g, '&quot;'); }
@@ -98,6 +122,8 @@ function getHTML(releases, films, playlists) {
     .tab { background: none; border: none; border-bottom: 2px solid transparent; margin-bottom: -1px; padding: 14px 20px 12px; font-family: inherit; font-weight: 100; font-size: 13px; color: #aaa; cursor: pointer; letter-spacing: 0.04em; }
     .tab.active { color: #111; border-bottom-color: #111; }
     .tab:hover { color: #111; }
+    .publish { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+    .publish .save-btn { padding: 7px 16px; font-size: 12px; }
 
     /* Pages */
     .page { display: none; flex: 1; overflow: hidden; }
@@ -188,6 +214,10 @@ function getHTML(releases, films, playlists) {
     <button class="tab active" onclick="switchTab('music')">music</button>
     <button class="tab" onclick="switchTab('film')">film</button>
     <button class="tab" onclick="switchTab('playlists')">playlists</button>
+    <div class="publish">
+      <span id="pub-status" class="status"></span>
+      <button class="save-btn" onclick="publish()">publish</button>
+    </div>
   </div>
 
   <!-- Music page -->
@@ -271,6 +301,7 @@ function getHTML(releases, films, playlists) {
           <input type="text" id="pl-slug" placeholder="url name, e.g. summer-mix">
           <input type="text" id="pl-title" placeholder="title">
           <input type="text" id="pl-desc" placeholder="description (optional)">
+          <input type="text" id="pl-spotify" placeholder="spotify playlist link (optional, playlist must be public)">
         </div>
         <ul id="pl-list"></ul>
         <div class="add-toggle" onclick="toggleAdd('pl')">+ add songs</div>
@@ -284,6 +315,7 @@ function getHTML(releases, films, playlists) {
         <div class="actions">
           <button class="save-btn" onclick="savePlaylist()">save playlist</button>
           <span id="pl-status" class="status"></span>
+          <button id="pl-delete" class="del-btn" style="margin-left:auto;font-size:12px" onclick="deletePlaylist()">delete playlist</button>
         </div>
       </div>
     </div>
@@ -592,6 +624,8 @@ function getHTML(releases, films, playlists) {
       slugInput.value = '';
       document.getElementById('pl-title').value = p.title || '';
       document.getElementById('pl-desc').value = p.description || '';
+      document.getElementById('pl-spotify').value = p.spotifyPlaylistUrl || '';
+      document.getElementById('pl-delete').style.display = slug ? '' : 'none';
       document.getElementById('pl-list').replaceChildren(...(p.tracks || []).map(plTrackItem));
       document.getElementById('pl-status').textContent = '';
       plUpdateInfo();
@@ -625,7 +659,8 @@ function getHTML(releases, films, playlists) {
       const st = document.getElementById('pl-status');
       if (!plSlug && playlists.some(p => p.slug === slug)) { st.textContent = 'that url name is taken.'; return; }
       const body = { slug, title: document.getElementById('pl-title').value.trim(),
-        description: document.getElementById('pl-desc').value.trim(), tracks: plTracks() };
+        description: document.getElementById('pl-desc').value.trim(),
+        spotifyPlaylistUrl: document.getElementById('pl-spotify').value.trim(), tracks: plTracks() };
       const res = await fetch('/save-playlist', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
       const data = await res.json();
       if (!res.ok) { st.textContent = data.error || 'error.'; return; }
@@ -633,6 +668,33 @@ function getHTML(releases, films, playlists) {
       Object.assign(playlists.find(p => p.slug === slug), body);
       plSelect.selectedOptions[0].textContent = body.title || slug;
       st.textContent = 'saved — commit and push to publish.';
+    }
+
+    async function deletePlaylist() {
+      const p = playlists.find(p => p.slug === plSlug);
+      if (!p || !confirm('Delete the playlist "' + (p.title || p.slug) + '"? Its link stops working once you publish.')) return;
+      const res = await fetch('/delete-playlist', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ slug: plSlug }) });
+      if (res.ok) { location.hash = 'pl='; location.reload(); }
+      else alert('Error deleting.');
+    }
+
+    // ─── Publish ─────────────────────────────────────────────
+    // Ask first: list what will go out, then commit + push on OK.
+    async function publish() {
+      const st = document.getElementById('pub-status');
+      st.textContent = '';
+      const res = await fetch('/publish-status');
+      const s = await res.json();
+      if (!res.ok) { st.textContent = s.error || 'error.'; return; }
+      if (s.branch !== 'main') { st.textContent = 'publishing only works on the main branch (now on ' + s.branch + ').'; return; }
+      if (!s.files.length && !s.ahead) { st.textContent = 'nothing to publish.'; return; }
+      const lines = s.files.map(f => '  ' + f);
+      if (s.ahead) lines.push('  + ' + s.ahead + ' earlier saved change(s) not yet published');
+      if (!confirm('Publish to adamlilienfeldt.com?\\n\\n' + lines.join('\\n') + '\\n\\nOnly saved changes are published.')) return;
+      st.textContent = 'publishing…';
+      const r = await fetch('/publish', { method: 'POST' });
+      const d = await r.json();
+      st.textContent = r.ok ? 'published — live in about 2 minutes.' : (d.error || 'error.');
     }
 
     const plSelect = document.getElementById('pl-select');
@@ -774,6 +836,49 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  if (req.method === 'GET' && req.url === '/publish-status') {
+    try { json(200, await publishStatus()); } catch (e) { json(500, { error: e.message }); }
+    return;
+  }
+
+  if (req.method === 'POST' && req.url === '/publish') {
+    try {
+      const { branch, files, ahead } = await publishStatus();
+      if (branch !== 'main') { json(400, { error: `publishing only works on the main branch (now on ${branch}).` }); return; }
+      if (!files.length && !ahead) { json(400, { error: 'nothing to publish.' }); return; }
+      if (files.length) {
+        await git('add', '-A', '--', ...CONTENT);
+        await git('commit', '-m', commitMessage(files), '--', ...CONTENT);
+      }
+      // Fetch separately so "can't reach github" isn't reported as a clash.
+      try { await git('fetch'); }
+      catch { json(502, { error: "couldn't reach github. check the internet connection and publish again — your changes are saved." }); return; }
+      try {
+        await git('rebase', '--autostash', '@{u}');
+      } catch {
+        // Abort also restores the autostashed files. If even that fails the repo
+        // is mid-rebase, so say so rather than the usual message.
+        const stuck = await git('rebase', '--abort').then(() => false, () => true);
+        json(409, { error: stuck
+          ? 'publishing stopped halfway (git is mid-rebase). ask for help before changing anything else.'
+          : 'github has changes that clash with yours. your changes are saved on this computer but not published. ask for help before publishing again.' });
+        return;
+      }
+      await git('push');
+      json(200, { ok: true });
+    } catch (e) { json(500, { error: `publish failed: ${e.stderr?.trim() || e.message}` }); }
+    return;
+  }
+
+  if (req.method === 'POST' && req.url === '/delete-playlist') {
+    try {
+      const { slug } = await readBody(req);
+      deletePlaylist(slug);
+      json(200, { ok: true });
+    } catch (e) { json(500, { error: e.message }); }
+    return;
+  }
+
   // Look up pasted Spotify track links (song.link scrape, iTunes, cover
   // download). Slow on purpose: ~1s per track to be polite to song.link.
   if (req.method === 'POST' && req.url === '/resolve-tracks') {
@@ -794,11 +899,13 @@ const server = http.createServer(async (req, res) => {
 
   if (req.method === 'POST' && req.url === '/save-playlist') {
     try {
-      const { slug, title, description, tracks } = await readBody(req);
+      const { slug, title, description, spotifyPlaylistUrl, tracks } = await readBody(req);
       if (!SLUG_RE.test(slug || '')) { json(400, { error: 'url name: lowercase letters, digits and dashes only.' }); return; }
-      const existing = readPlaylist(slug) || {};
+      if (spotifyPlaylistUrl && !/^https:\/\/open\.spotify\.com\/playlist\/[A-Za-z0-9]+/.test(spotifyPlaylistUrl)) {
+        json(400, { error: 'spotify playlist link should look like https://open.spotify.com/playlist/…' }); return;
+      }
       writePlaylist(slug, { title: title || slug.replace(/-/g, ' '), description: description || '',
-        spotifyPlaylistUrl: existing.spotifyPlaylistUrl || '', tracks });
+        spotifyPlaylistUrl: spotifyPlaylistUrl || '', tracks });
       json(200, { ok: true });
     } catch (e) { json(500, { error: e.message }); }
     return;
@@ -807,4 +914,6 @@ const server = http.createServer(async (req, res) => {
   res.writeHead(404); res.end();
 });
 
-server.listen(PORT, () => { console.log(`\nAdmin → http://localhost:${PORT}\n`); });
+// Localhost only: the admin can edit files and push to GitHub, so it must
+// not be reachable from other machines on the network.
+server.listen(PORT, '127.0.0.1', () => { console.log(`\nAdmin → http://localhost:${PORT}\n`); });

@@ -9,7 +9,8 @@
     "admin": "node admin.js",
     "fetch-covers": "node fetch-covers.js",
     "check": "astro check",
-    "playlist:add": "node add-playlist.js"
+    "playlist:add": "node add-playlist.js",
+    "admin:app": "./build-admin-app.sh --install"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.6",

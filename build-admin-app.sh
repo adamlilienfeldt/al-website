@@ -43,8 +43,11 @@ on run
 	end try
 
 	if not alreadyRunning then
-		-- Output must be redirected or do shell script waits forever.
-		set serverPID to do shell script "cd " & quoted form of repoDir & " && PATH=/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin nohup " & quoted form of nodePath & " admin.js >> " & quoted form of logFile & " 2>&1 & echo \$!"
+		-- Only the node command goes in the background ("cd ...; node ... &", not
+		-- "cd ... && node ... &", which backgrounds a subshell that holds this
+		-- pipe open). Its output must be redirected too, or do shell script
+		-- waits for the server to exit. \$! is then node's own PID for quit.
+		set serverPID to do shell script "cd " & quoted form of repoDir & "; PATH=/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin nohup " & quoted form of nodePath & " admin.js < /dev/null >> " & quoted form of logFile & " 2>&1 & echo \$!"
 	end if
 
 	repeat 20 times

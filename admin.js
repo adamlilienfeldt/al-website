@@ -95,7 +95,7 @@ function getHTML(releases, films, playlists) {
     const id = encodeURIComponent(f.title);
     const cover = f.cover || '';
     const isVid = !!f.vimeo_id;
-    return `<li class="item${f.hidden ? ' is-hidden' : ''}" data-hidden="${f.hidden ? '1' : ''}" data-id="${id}" data-cover="${esc(cover)}" data-title="${esc(f.title)}" data-role="${esc(f.role)}" data-vimeo="${esc(f.vimeo_id)}" data-year="${esc(f.year)}" data-link="${esc(f.link)}">
+    return `<li class="item${f.hidden ? ' is-hidden' : ''}" data-hidden="${f.hidden ? '1' : ''}" data-id="${id}" data-cover="${esc(cover)}" data-title="${esc(f.title)}" data-role="${esc(f.role)}" data-director="${esc(f.director)}" data-company="${esc(f.film_company)}" data-vimeo="${esc(f.vimeo_id)}" data-year="${esc(f.year)}" data-link="${esc(f.link)}">
       <div class="item-row">
         <span class="handle">⠿</span>
         ${cover ? `<img src="${cover}" alt="">` : `<div class="thumb${isVid ? ' vid' : ''}">${isVid ? '▶' : ''}</div>`}
@@ -200,12 +200,16 @@ function getHTML(releases, films, playlists) {
     /* Preview */
     .preview-label { font-size: 11px; font-weight: 100; color: #bbb; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 14px; }
     .preview-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-    .preview-card { aspect-ratio: 1; background: #e0e0e0; overflow: hidden; position: relative; cursor: grab; }
+    .preview-card { aspect-ratio: 1; background: #e0e0e0; overflow: hidden; position: relative; cursor: grab; container-type: inline-size; }
     .preview-card:active { cursor: grabbing; }
     .preview-card.sortable-ghost { opacity: 0.3; }
     .preview-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .preview-card.vid-card { background: #1a1a1a; display: flex; align-items: center; justify-content: center; color: #444; font-size: 20px; }
-    .preview-card .label { position: absolute; inset: 0; background: rgba(0,0,0,0.6); color: #fff; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 10px; padding: 6px; opacity: 0; transition: opacity 0.15s; line-height: 1.4; }
+    /* Mirrors the site's hover overlay (.card-overlay in global.css), with
+       sizes scaled to the tile so it reads the same at preview size. */
+    .preview-card .label { position: absolute; inset: 0; background: rgba(0,0,0,0.72); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 4px; padding: 8cqw; opacity: 0; transition: opacity 0.15s; }
+    .preview-card .label-heading { font-size: clamp(11px, 7cqw, 22px); font-weight: 100; -webkit-text-stroke: 0.2px currentColor; line-height: 1.3; }
+    .preview-card .label-info { font-size: clamp(10px, 5cqw, 15px); font-weight: 300; opacity: 0.7; line-height: 1.4; }
     .preview-card:hover .label { opacity: 1; }
   </style>
 </head>
@@ -474,7 +478,11 @@ function getHTML(releases, films, playlists) {
           const cover = el.dataset.cover;
           return \`<div class="preview-card\${el.dataset.hidden ? ' is-hidden' : ''}" data-id="\${el.dataset.id}">
             \${cover ? \`<img src="\${cover}" alt="">\` : ''}
-            <div class="label">\${el.dataset.artist}<br><span style="opacity:0.7">\${el.dataset.title}</span></div>
+            <div class="label">
+              <p class="label-heading">\${el.dataset.artist} - \${el.dataset.title}</p>
+              \${el.dataset.credits ? \`<p class="label-info">\${el.dataset.credits}</p>\` : ''}
+              \${el.dataset.label ? \`<p class="label-info">(\${el.dataset.label})</p>\` : ''}
+            </div>
           </div>\`;
         }).join('');
       if (musicPreviewSortable) musicPreviewSortable.destroy();
@@ -529,7 +537,12 @@ function getHTML(releases, films, playlists) {
           return \`<div class="preview-card \${isVid && !cover ? 'vid-card' : ''}\${el.dataset.hidden ? ' is-hidden' : ''}" data-id="\${el.dataset.id}">
             \${isVid && !cover ? '▶' : ''}
             \${cover ? \`<img src="\${cover}" alt="">\` : ''}
-            <div class="label">\${el.dataset.title}\${el.dataset.role ? \`<br><span style="opacity:0.7">\${el.dataset.role}</span>\` : ''}</div>
+            <div class="label">
+              <p class="label-heading">\${el.dataset.title}</p>
+              \${el.dataset.role ? \`<p class="label-info">\${el.dataset.role}</p>\` : ''}
+              \${el.dataset.director ? \`<p class="label-info">dir. \${el.dataset.director}</p>\` : ''}
+              \${el.dataset.company ? \`<p class="label-info">\${el.dataset.company}</p>\` : ''}
+            </div>
           </div>\`;
         }).join('');
       if (filmPreviewSortable) filmPreviewSortable.destroy();

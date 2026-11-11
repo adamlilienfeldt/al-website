@@ -7,6 +7,7 @@ Reference: https://ad93.ltd/ (stylesheet: https://ad93.ltd/assets/scss/styleshee
 Alternatives (same data, also throwaway):
 - **A: Index**, [`index-list.html`](index-list.html): text-first list, cover follows the cursor. https://claude.ai/artifact/QsQkoswnYcPSfYL1odcdcV
 - **B: One at a time**, [`single.html`](single.html): one big cover, counter, thumbnail scrubber, lowercase mono. https://claude.ai/artifact/P5wZJHiMzfamBEftNaAsrF
+- **C: Contact sheet**, [`contact-sheet.html`](contact-sheet.html): slim sticky bar, covers in a hairline-ruled grid (produced albums 2×2), role filter (produced / mixed / engineered / played / wrote) derived from `credits`, streaming links fade in over the cover. Started from pcmusic.info, then stripped down. Data is inlined, not `data.js`. https://claude.ai/artifact/2RPGfrQ9sskPxkMAkVWdxZ
 
 The plan below is written for the AD93 version; most of it (tokens, Layout, card → new component, server-rendered lists) carries over to A or B.
 

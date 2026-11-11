@@ -1,0 +1,301 @@
+<!doctype html>
+<!-- Mockup C "Contact sheet": hairline-ruled cover grid, role filter, links revealed on the cover. Open directly in a browser. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adam Lilienfeldt Shine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300..600&display=swap">
+<style>
+/* Layout: a slim sticky bar, then a contact sheet: covers in a hairline-ruled grid
+   (shared rules, no gaps, no cards); headline albums take a 2×2 cell. The covers are the colour. */
+:root {
+  --bg: #fbfbfc;
+  --fg: #16171a;
+  --muted: #7d8089;
+  --line: #dfe0e4;
+  --veil: rgba(251, 251, 252, .94);
+  --font: "Helvetica Neue", "Inter", Helvetica, Arial, sans-serif;
+  --pad: 12px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111214; --fg: #ececee; --muted: #8a8d96; --line: #2a2c31; --veil: rgba(17, 18, 20, .93);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111214; --fg: #ececee; --muted: #8a8d96; --line: #2a2c31; --veil: rgba(17, 18, 20, .93);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font);
+  font-size: 13px;
+  line-height: 1.45;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 48px;
+}
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto; z-index: 10;
+  height: env(safe-area-inset-top, 0px); background: var(--bg);
+}
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+:focus-visible { outline: 1px solid var(--fg); outline-offset: 2px; }
+
+/* ── Bar ──────────────────────────────────────────────── */
+.bar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+  background: var(--bg);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: 8px 24px;
+  padding-block: 18px 14px;
+}
+.name { font-weight: 500; letter-spacing: -.005em; white-space: nowrap; }
+.bio { color: var(--muted); min-width: 0; }
+.nav { display: flex; gap: 18px; }
+.nav a, .nav button { color: var(--muted); }
+.nav a:hover, .nav button:hover, .nav [aria-current="true"] { color: var(--fg); }
+.contact-line { grid-column: 1 / -1; display: flex; gap: 12px; align-items: baseline; color: var(--muted); }
+.contact-line .email { color: var(--fg); user-select: all; }
+.contact-line button { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 640px) {
+  .bar { grid-template-columns: 1fr auto; }
+  .bio { grid-column: 1 / -1; grid-row: 2; }
+}
+
+/* ── Filter ───────────────────────────────────────────── */
+.filter {
+  display: flex; flex-wrap: wrap; gap: 4px 18px;
+  padding-block: 22px 12px;
+  border-top: 1px solid var(--line);
+}
+.filter button { color: var(--muted); }
+.filter button:hover { color: var(--fg); }
+.filter button[aria-pressed="true"] { color: var(--fg); }
+.filter sup { font-size: 9px; margin-left: 2px; font-variant-numeric: tabular-nums; }
+
+/* ── Contact sheet ────────────────────────────────────── */
+.sheet {
+  list-style: none; margin: 0; padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(200px, 50% - 1px), 1fr));
+  grid-auto-flow: row dense;
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+.cell {
+  position: relative;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: var(--pad);
+  display: flex; flex-direction: column; gap: 10px;
+  min-width: 0;
+}
+.cell[hidden] { display: none !important; }
+@media (min-width: 700px) {
+  .cell.large { grid-column: span 2; grid-row: span 2; }
+}
+.art {
+  position: relative; display: block; width: 100%; max-width: 100%;
+  aspect-ratio: 1; overflow: hidden; background: var(--line);
+}
+.art img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.film .art { aspect-ratio: 3 / 2; }
+.links {
+  position: absolute; inset: 0;
+  background: var(--veil);
+  display: flex; flex-direction: column; justify-content: flex-end; gap: 2px;
+  padding: var(--pad);
+  opacity: 0; visibility: hidden;
+  transition: opacity .18s ease, visibility 0s linear .18s;
+}
+.cell.open .links { opacity: 1; visibility: visible; transition: opacity .18s ease; }
+.links a { padding: 3px 0; display: flex; justify-content: space-between; }
+.links a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.links a span { color: var(--muted); }
+.cap { display: grid; gap: 1px; margin-top: auto; }
+.cap .t { font-weight: 500; overflow-wrap: anywhere; }
+.cap .a { overflow-wrap: anywhere; }
+.cap .r { color: var(--muted); margin-top: 6px; font-size: 11.5px; overflow-wrap: anywhere; }
+.large .cap .t { font-size: 15px; }
+
+.section-label {
+  display: flex; justify-content: space-between; gap: 12px;
+  padding-block: 40px 12px; color: var(--muted);
+}
+.section-label h2 { margin: 0; font-size: 13px; font-weight: 500; color: var(--fg); }
+
+footer {
+  display: flex; flex-wrap: wrap; gap: 18px; justify-content: space-between;
+  padding-block: 40px 0; color: var(--muted);
+}
+footer a:hover { color: var(--fg); }
+
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+@media (prefers-reduced-motion: reduce) {
+  .links, .cell.open .links { transition: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <a class="name" href="#music">adam lilienfeldt</a>
+  <span class="bio">producer, engineer, musician and composer based in copenhagen</span>
+  <nav class="nav" aria-label="Sections">
+    <a href="#music" aria-current="true">music</a>
+    <a href="#film">film</a>
+    <button type="button" id="contactBtn" aria-expanded="false" aria-controls="contactLine">contact</button>
+  </nav>
+  <div class="contact-line" id="contactLine" hidden>
+    <span class="email" id="email">lilienfeldt.adam@gmail.com</span>
+    <button type="button" id="copyEmail">copy</button>
+  </div>
+</header>
+
+<main>
+  <h1 class="vh">Adam Lilienfeldt — music and film credits</h1>
+  <div class="filter" id="music" role="group" aria-label="Filter by role"></div>
+  <ul class="sheet" id="releases"></ul>
+
+  <div class="section-label" id="film"><h2>film</h2><span id="filmCount"></span></div>
+  <ul class="sheet" id="films"></ul>
+</main>
+
+<footer>
+  <span>© adam lilienfeldt</span>
+  <span style="display:flex;gap:18px">
+    <a href="https://open.spotify.com/playlist/4rTHpry598NrYFQDMYMTIU" target="_blank" rel="noopener">spotify</a>
+    <a href="https://www.discogs.com/artist/6201540-Adam-Lilienfeldt" target="_blank" rel="noopener">discogs</a>
+  </span>
+</footer>
+
+<script id="data" type="application/json">{"music": [{"artist": "Sara Lina", "title": "Us Girls", "type": "single", "credits": "mixer", "label": "Nordic Music Society", "link": "https://song.link/s/6imIpDAHSQdWIA6W9YIv6W", "services": {"spotify": "https://open.spotify.com/track/6imIpDAHSQdWIA6W9YIv6W", "tidal": "https://listen.tidal.com/track/475335125", "appleMusic": "https://music.apple.com/us/album/us-girls-feat-adam-peleg/1854223098"}, "cover": "../src/assets/covers/sara-lina-us-girls.jpg"}, {"artist": "Niah Steiner", "title": "Hide n Seek", "type": "single", "credits": "producer, all instruments", "label": "", "link": "https://song.link/s/47btYMsFBXwj9RXdBZzB4N", "services": {"spotify": "https://open.spotify.com/track/47btYMsFBXwj9RXdBZzB4N", "tidal": "https://listen.tidal.com/track/439371237", "appleMusic": "https://music.apple.com/us/album/hide-n-seek/1817133875?i=1817134361"}, "cover": "../src/assets/covers/niah-steiner-hide'n'seek.jpg"}, {"artist": "ALAWARI", "title": "Leviathan", "type": "album", "credits": "mixer", "label": "April Records", "link": "https://album.link/mppmscvsctxd2", "services": {"spotify": "https://open.spotify.com/album/3AeY3nIYWuuYHF8HqTcCg4", "tidal": "https://listen.tidal.com/album/382290559", "appleMusic": "https://music.apple.com/us/album/leviathan/1763840136"}, "cover": "../src/assets/covers/alawari-leviathan.jpg"}, {"artist": "Kindsight", "title": "Swedish Punk", "type": "album", "credits": "producer, engineer, mixer, add. instruments", "label": "Rama Lama Records", "link": "https://album.link/xhwj3gf0kccsw", "services": {"spotify": "https://open.spotify.com/album/41auDAYLwqCF7zAxghkeaA", "tidal": "https://listen.tidal.com/album/202657642"}, "cover": "../src/assets/covers/kindsight-swedish-punk.jpg"}, {"artist": "Elvira Alfaro", "title": "Human", "type": "single", "credits": "producer, mixer, various instruments", "label": "Capella Records", "link": "https://song.link/76jqsk79fn4pd", "services": {"spotify": "https://open.spotify.com/track/77RDG46UcExbT1LFjZvU3Q", "tidal": "https://listen.tidal.com/track/396222450", "appleMusic": "https://music.apple.com/us/album/human/1776668344"}, "cover": "../src/assets/covers/elvira-alfaro-human.jpg"}, {"artist": "Sara Lina", "title": "Brava", "type": "single", "credits": "mixer, co-producer, programming, bass", "label": "Nordic Music Society", "link": "https://song.link/s/0mqKvmI0KGKJPU3IEENaBP", "services": {"spotify": "https://open.spotify.com/track/0mqKvmI0KGKJPU3IEENaBP", "tidal": "https://listen.tidal.com/track/454332902", "appleMusic": "https://music.apple.com/us/album/brava/1833477239"}, "cover": "../src/assets/covers/sara-lina-brava.jpg"}, {"artist": "ELBA", "title": "tjære og glimmer", "type": "album", "credits": "producer, mixer, various instruments, co-writer (tracks 1-2, 4-10)", "label": "Nordic Music Society", "link": "https://open.spotify.com/album/2QUJPf0O26XoLd1u75GNpc?si=1cFJxQCFRD2vj3_yPVQRQA", "services": {"spotify": "https://open.spotify.com/album/2QUJPf0O26XoLd1u75GNpc", "tidal": "https://listen.tidal.com/album/552433931"}, "cover": "../src/assets/covers/elba-tj-re-og-glimmer.jpg"}, {"artist": "Elvira Alfaro", "title": "in love with a feeling", "type": "EP", "credits": "producer, co-writer, mixer, various instruments", "label": "", "link": "https://album.link/dxhh492jxw3xz", "services": {"spotify": "https://open.spotify.com/album/6KPLM9ev4MsL66aqvGshdV", "tidal": "https://listen.tidal.com/album/303538063", "appleMusic": "https://music.apple.com/us/album/in-love-with-the-feeling/1696120692"}, "cover": "../src/assets/covers/elvira-alfaro-in-love-with-a-feeling.jpg"}, {"artist": "ELBA", "title": "nu skal hele verden dreje sig om mig", "type": "single", "credits": "producer, mixer, various instruments", "label": "Nordic Music Society", "link": "https://open.spotify.com/track/1EToAwQ2ecOX3CSan1mumw?si=1963537df8214595", "services": {"spotify": "https://open.spotify.com/track/1EToAwQ2ecOX3CSan1mumw", "tidal": "https://listen.tidal.com/track/526579039"}, "cover": "../src/assets/covers/elba-nu-skal-hele-verden-dreje-sig-om-mig.jpg"}, {"artist": "Slørede Linier", "title": "Hele Verden, Altid", "type": "album", "credits": "producer, mixer, various instruments", "label": "Kös", "link": "https://album.link/hkxnxzcrrffxp", "services": {"spotify": "https://open.spotify.com/album/67x40CyMHf9IlvXmOHbvM5", "tidal": "https://listen.tidal.com/album/363362771", "appleMusic": "https://music.apple.com/us/album/hele-verden-altid/1746534409"}, "cover": "../src/assets/covers/slorede-linier-hele-verden-altid.jpg"}, {"artist": "Slørede Linier", "title": "Uendeligt", "type": "single", "credits": "producer, mixer, various instruments", "label": "Kös", "link": "https://album.link/b8j294stcmvfj", "services": {"spotify": "https://open.spotify.com/album/7CSgmaJ2HkklpfPYiRt8sb", "appleMusic": "https://music.apple.com/us/album/uendeligt/1736948355"}, "cover": "../src/assets/covers/slorede-linier-uendeligt.jpg"}, {"artist": "Kindsight", "title": "Love You Baby All the Time", "type": "single", "credits": "producer, engineer, mixer, organ", "label": "Rama Lama Records", "link": "https://song.link/s/2OaP7Y6wrRj7UG1Sejc5vl", "services": {"spotify": "https://open.spotify.com/track/2OaP7Y6wrRj7UG1Sejc5vl", "tidal": "https://listen.tidal.com/track/244161190", "appleMusic": "https://music.apple.com/us/album/love-you-baby-all-the-time/1785768775"}, "cover": "../src/assets/covers/kindsight-love-you-baby-all-the-time.jpg"}, {"artist": "Fraads", "title": "Hard drive schlappers (tracks 4+5)", "type": "album", "credits": "co-producer, co-writer, bass, guitar, drums (track 5)", "label": "Sony Music", "link": "https://song.link/s/6QrkmoKvgpiRcvcyINGYSg", "services": {"spotify": "https://open.spotify.com/track/6QrkmoKvgpiRcvcyINGYSg", "tidal": "https://listen.tidal.com/track/432118201"}, "cover": "../src/assets/covers/fraads-hard-drive-schlappers.jpg"}, {"artist": "Erik Apollo", "title": "Digter", "type": "single", "credits": "producer, synths, guitars", "label": "Nordic Music Society", "link": "https://song.link/ddxvjhvwrqw9p", "services": {"spotify": "https://open.spotify.com/track/0GdVALjZssFtblZxX7ARtd", "tidal": "https://listen.tidal.com/track/422322585", "appleMusic": "https://music.apple.com/us/album/digter/1800551274?i=1800551279"}, "cover": "../src/assets/covers/erik-apollo-digter.jpg"}, {"artist": "Slørede Linier", "title": "Med Tid Vokser Det Fra Os / Venner Lever Tusind År", "type": "single", "credits": "producer, mixer, various instruments", "label": "Kös", "link": "https://song.link/qzts0sp0shkws", "services": {"spotify": "https://open.spotify.com/track/6S7AzYMJO8OjAVQS385rTI", "tidal": "https://listen.tidal.com/track/342286462", "appleMusic": "https://music.apple.com/us/album/med-tid-vokser-det-fra-os/1727630125"}, "cover": "../src/assets/covers/slorede-linier-med-tid-vokser.jpg"}, {"artist": "Vera Decay", "title": "Cinders", "type": "single", "credits": "producer, bass, synths, programming", "label": "Nordic Music Society", "link": "https://song.link/s/797WOJarBkLGZc5cZJPqsG", "services": {"spotify": "https://open.spotify.com/track/797WOJarBkLGZc5cZJPqsG", "tidal": "https://listen.tidal.com/track/420254614", "appleMusic": "https://music.apple.com/us/album/cinders/1800671592?i=1800671882"}, "cover": "../src/assets/covers/vera-decay-cinders.jpg"}, {"artist": "Elvira Alfaro", "title": "Indigo", "type": "single", "credits": "producer, mixer, various instruments", "label": "Capella Records", "link": "https://song.link/s/41uxZueNAEyf4X3MjbwXSf", "services": {"spotify": "https://open.spotify.com/track/41uxZueNAEyf4X3MjbwXSf", "tidal": "https://listen.tidal.com/track/293143341", "appleMusic": "https://music.apple.com/us/album/indigo/1686547548"}, "cover": "../src/assets/covers/elvira-alfaro-indigo.jpg"}, {"artist": "Fraads", "title": "FRaaaDS", "type": "album", "credits": "engineering", "label": "Sony Music", "link": "https://album.link/s/0dGKrAZ00rZ5sOcbJvA5gy", "services": {"spotify": "https://open.spotify.com/album/0dGKrAZ00rZ5sOcbJvA5gy", "tidal": "https://listen.tidal.com/album/151566371"}, "cover": "../src/assets/covers/fraads-fraaads.jpg"}, {"artist": "Elvira Alfaro", "title": "space", "type": "single", "credits": "producer, mixer, various instruments", "label": "Capella Records", "link": "https://song.link/dk/i/1610322228", "services": {"appleMusic": "https://geo.music.apple.com/dk/album/_/1610322225?i=1610322228&mt=1&app=music&ls=1", "tidal": "https://listen.tidal.com/track/216939686"}, "cover": "../src/assets/covers/elvira-alfaro-space.jpg"}, {"artist": "J. Fen Hapens", "title": "22 Skidoo / Sundays", "type": "single", "credits": "producer, various instruments", "label": "", "link": "https://song.link/wvx5q6kzdhj4w", "services": {"spotify": "https://open.spotify.com/track/5wlzqdWiEUuW1n9hrPl1wm", "tidal": "https://listen.tidal.com/track/140528439", "appleMusic": "https://music.apple.com/us/album/22-skidoo/1512165148?i=1512165819"}, "cover": "../src/assets/covers/j-fen-hapens-22-skidoo-sundays.jpg"}, {"artist": "J. Fen Hapens", "title": "Getting Later / Troubled", "type": "single", "credits": "producer, mixer, various instruments", "label": "", "link": "https://song.link/2b6m8wfvgjkn0", "services": {"spotify": "https://open.spotify.com/track/2OcB9IgMk5WNBuC7NY0mNJ", "tidal": "https://listen.tidal.com/track/107303953"}, "cover": "../src/assets/covers/j-fen-hapens-getting-later-troubled.jpg"}, {"artist": "Malte Dueholm", "title": "er bladene blæst ned", "type": "album", "credits": "producer, mixer, engineer", "label": "", "link": "https://album.link/s/285KIVMOhpOsKnoD7pj5fG", "services": {"spotify": "https://open.spotify.com/album/285KIVMOhpOsKnoD7pj5fG", "tidal": "https://listen.tidal.com/album/118365004", "appleMusic": "https://music.apple.com/us/album/er-bladene-bl%C3%A6st-ned/1480793221"}, "cover": "../src/assets/covers/malte-dueholm-er-bladene-blaest-ned.jpg"}, {"artist": "Nooooooo & Thurston Moore", "title": "Daylight", "type": "album", "credits": "co-producer, co-mixer, co-engineer", "label": "Kjeldfred & Overgaard", "link": "https://album.link/s/2B2tc6UtdqgwzcGK561F7H", "services": {"spotify": "https://open.spotify.com/album/2B2tc6UtdqgwzcGK561F7H", "tidal": "https://listen.tidal.com/album/137898627", "appleMusic": "https://music.apple.com/us/album/daylight-feat-thurston-moore/1508544958"}, "cover": "../src/assets/covers/nooooooo-daylight.jpg"}, {"artist": "Alcabean", "title": "Confessions", "type": "album", "credits": "keyboards", "label": "W.A.S Entertainment", "link": "https://album.link/gt2dhcqsgfvmv", "services": {"spotify": "https://open.spotify.com/album/2tdY5eQZxIxUqhiw0Wwiyo", "tidal": "https://listen.tidal.com/album/473034176", "appleMusic": "https://music.apple.com/us/album/confessions/1857963087"}, "cover": "../src/assets/covers/alcabean-confessions.jpg"}, {"artist": "Bona Fide", "title": "Prince Of Scars / Joy", "type": "single", "credits": "mixer", "label": "Escho", "link": "https://album.link/s/1SPLGYeTWAMoOXszd3RlWi", "services": {"spotify": "https://open.spotify.com/album/1SPLGYeTWAMoOXszd3RlWi", "appleMusic": "https://music.apple.com/us/album/prince-of-scars/1495683503?i=1495684073"}, "cover": "../src/assets/covers/bona-fide-joy-prince-of-scars.jpg"}, {"artist": "Zola Mennenöh", "title": "Longing For Belonging", "type": "album", "credits": "engineer", "label": "figure 8 records", "link": "https://album.link/kn3rm0jmb8skr", "services": {"spotify": "https://open.spotify.com/album/4WkD0GCZdZzfi6l1oE63Kw", "tidal": "https://listen.tidal.com/album/153134823", "appleMusic": "https://music.apple.com/us/album/longing-for-belonging/1529194440"}, "cover": "../src/assets/covers/zola-mennenoh-longing-for-belonging.jpg"}], "film": [{"title": "A Word For Human", "role": "co-composer (with christian balvig)", "director": "Mauricio Gonzalez Aranda", "company": "Final Cut for Real", "link": "https://vimeo.com/302691761", "cover": "../src/assets/covers/a-word-for-human.jpg"}, {"title": "Kødsår", "role": "composer", "director": "Josefine Exner", "company": "Den Danske Filmskole", "link": "", "cover": "../src/assets/covers/kodsaar.jpg"}, {"title": "Trommeslager", "role": "co-composer (with christian balvig)", "director": "Josefine Exner", "company": "Copenhagen Film Company", "link": "https://vimeo.com/257884192", "cover": "../src/assets/covers/trommeslager.jpg"}]}</script>
+<script>
+(() => {
+  const D = JSON.parse(document.getElementById('data').textContent);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const host = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return ''; } };
+  const SVC = { spotify: 'spotify', appleMusic: 'apple music', tidal: 'tidal' };
+
+  // Roles derived from the credits line, so the filter always matches the data.
+  const ROLES = {
+    produced:   c => /producer/.test(c),
+    mixed:      c => /mix/.test(c),
+    engineered: c => /engineer/.test(c),
+    played:     c => /instrument|bass|guitar|synth|organ|keyboard|drum|programming/.test(c),
+    wrote:      c => /writer/.test(c),
+  };
+  const rolesOf = r => Object.keys(ROLES).filter(k => ROLES[k](r.credits.toLowerCase()));
+  const isLarge = r => r.type === 'album' && /(^|,\s*)producer/.test(r.credits);
+
+  const cells = D.music.map((r, i) => {
+    const svc = Object.entries(SVC).filter(([k]) => r.services && r.services[k])
+      .map(([k, l]) => `<a href="${esc(r.services[k])}" target="_blank" rel="noopener">${l}<span>↗</span></a>`);
+    if (r.link) svc.push(`<a href="${esc(r.link)}" target="_blank" rel="noopener">all platforms<span>↗</span></a>`);
+    const meta = [r.credits, r.label].filter(Boolean).map(esc).join(' · ');
+    return `<li class="cell${isLarge(r) ? ' large' : ''}" data-roles="${rolesOf(r).join(' ')}">
+      <button class="art" type="button" aria-expanded="false" aria-controls="l${i}" aria-label="${esc(r.title)} by ${esc(r.artist)}, show listening links">
+        ${r.cover ? `<img src="${esc(r.cover)}" alt="" width="720" height="720" loading="${i < 10 ? 'eager' : 'lazy'}" decoding="async">` : ''}
+      </button>
+      <div class="links" id="l${i}">${svc.join('')}</div>
+      <div class="cap">
+        <span class="t">${esc(r.title)}</span>
+        <span class="a">${esc(r.artist)}</span>
+        <span class="r">${meta}</span>
+      </div>
+    </li>`;
+  }).join('');
+  const sheet = document.getElementById('releases');
+  sheet.innerHTML = cells;
+
+  // The links veil sits inside .art's box; position it over the art.
+  sheet.querySelectorAll('.cell').forEach(c => {
+    const art = c.querySelector('.art'), links = c.querySelector('.links');
+    art.appendChild(links);
+  });
+
+  // ── Filter
+  const filter = document.getElementById('music');
+  const all = [...sheet.children];
+  const count = k => all.filter(c => c.dataset.roles.split(' ').includes(k)).length;
+  const keys = ['all', ...Object.keys(ROLES)];
+  filter.innerHTML = keys.map(k =>
+    `<button type="button" data-k="${k}" aria-pressed="${k === 'all'}">${k}<sup>${k === 'all' ? all.length : count(k)}</sup></button>`).join('');
+  filter.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    const k = b.dataset.k;
+    filter.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    all.forEach(c => { c.hidden = k !== 'all' && !c.dataset.roles.split(' ').includes(k); });
+    closeAll();
+  });
+
+  // ── Tap a cover to reveal its links in place
+  function closeAll(except) {
+    sheet.querySelectorAll('.cell.open').forEach(c => {
+      if (c === except) return;
+      c.classList.remove('open'); c.querySelector('.art').setAttribute('aria-expanded', 'false');
+    });
+  }
+  sheet.addEventListener('click', e => {
+    if (e.target.closest('.links a')) return;
+    const art = e.target.closest('.art'); if (!art) return;
+    e.preventDefault();
+    const cell = art.closest('.cell');
+    closeAll(cell);
+    const open = cell.classList.toggle('open');
+    art.setAttribute('aria-expanded', String(open));
+  });
+  document.addEventListener('click', e => { if (!e.target.closest('.cell')) closeAll(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); });
+
+  // ── Film
+  document.getElementById('films').innerHTML = D.film.map(f => `<li class="cell film">
+      ${f.link ? `<a class="art" href="${esc(f.link)}" target="_blank" rel="noopener" aria-label="Watch ${esc(f.title)} on Vimeo">` : `<div class="art">`}
+        <img src="${esc(f.cover)}" alt="" loading="lazy" decoding="async">
+      ${f.link ? `</a>` : `</div>`}
+      <div class="cap">
+        <span class="t">${esc(f.title)}</span>
+        <span class="a">dir. ${esc(f.director)}</span>
+        <span class="r">${esc(f.role)} · ${esc(f.company)}</span>
+      </div>
+    </li>`).join('');
+  document.getElementById('filmCount').textContent = D.film.length;
+
+  // ── Contact reveals the address inline
+  const cBtn = document.getElementById('contactBtn'), cLine = document.getElementById('contactLine');
+  cBtn.addEventListener('click', () => {
+    cLine.hidden = !cLine.hidden; cBtn.setAttribute('aria-expanded', String(!cLine.hidden));
+  });
+  document.getElementById('copyEmail').addEventListener('click', async e => {
+    const btn = e.currentTarget, el = document.getElementById('email');
+    try { await navigator.clipboard.writeText(el.textContent); btn.textContent = 'copied'; }
+    catch { const s = getSelection(), r = document.createRange(); r.selectNodeContents(el); s.removeAllRanges(); s.addRange(r); btn.textContent = 'selected'; }
+    setTimeout(() => { btn.textContent = 'copy'; }, 1600);
+  });
+
+  // ── Nav state follows scroll position
+  const navLinks = document.querySelectorAll('.nav a');
+  const filmTop = () => document.getElementById('film').getBoundingClientRect().top;
+  addEventListener('scroll', () => {
+    const inFilm = filmTop() < innerHeight * .5;
+    navLinks.forEach(a => a.setAttribute('aria-current', String(a.hash === (inFilm ? '#film' : '#music'))));
+  }, { passive: true });
+})();
+</script>
+</body>
+</html>
